@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng ký Quản trị - Smart POS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #FF9F66;
+            --primary-light: #FFF2EB;
+            --primary-hover: #F28B50;
+            --page-bg: #F9FAFB;
+            --card-bg: #FFFFFF;
+            --text-main: #2D3748;
+            --text-muted: #718096;
+            --border-light: #F0F2F5;
+            --success: #48BB78;
+            --danger: #F56565;
+            --radius-xl: 32px;
+            --radius-lg: 16px;
+            --radius-pill: 50px;
+            --shadow-md: 0 20px 50px rgba(0,0,0,0.06);
+            --shadow-accent: 0 8px 24px rgba(255,159,102,0.28);
+            --transition: 0.3s cubic-bezier(0.4,0,0.2,1);
+            --font: 'Be Vietnam Pro', sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: var(--font);
+            background: var(--page-bg);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            color: var(--text-main);
+        }
+
+        .bg-blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            z-index: 0;
+            opacity: 0.4;
+        }
+        .blob-orange { width: 600px; height: 600px; background: #FFD4BA; top: -200px; left: -150px; }
+        .blob-beige  { width: 500px; height: 500px; background: #FFF2EB; bottom: -150px; right: -100px; }
+
+        .register-wrapper {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 1000px;
+            display: flex;
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            background: var(--card-bg);
+            border: 1px solid var(--border-light);
+            min-height: 600px;
+        }
+
+        /* Banner trái */
+        .register-info {
+            background: linear-gradient(135deg, #FF9F66 0%, #F28B50 100%);
+            color: #fff;
+            padding: 60px 48px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            width: 45%;
+            position: relative;
+            overflow: hidden;
+        }
+        .register-info::after {
+            content: '';
+            position: absolute;
+            width: 300px; height: 300px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            bottom: -100px; right: -100px;
+        }
+        .register-info .logo-icon { font-size: 4rem; margin-bottom: 16px; display: inline-block; }
+        .register-info h2 { font-size: 2.2rem; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 12px; line-height: 1.2; }
+        .register-info p { color: rgba(255,255,255,0.9); font-size: 1rem; font-weight: 400; line-height: 1.6; }
+
+        /* Form */
+        .register-card {
+            padding: 50px 64px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: var(--card-bg);
+        }
+        .register-card h3 { font-weight: 700; font-size: 1.75rem; color: var(--text-main); margin-bottom: 24px; }
+
+        .form-label { font-weight: 600; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px; }
+
+        .password-wrapper { position: relative; display: flex; align-items: center; }
+        .password-wrapper .toggle-password {
+            position: absolute; right: 16px;
+            cursor: pointer; color: var(--text-muted);
+            transition: var(--transition); font-size: 1.1rem;
+        }
+        .password-wrapper .toggle-password:hover { color: var(--primary); }
+        .password-wrapper .form-control { padding-right: 45px; }
+
+        .form-control {
+            border-radius: var(--radius-lg);
+            padding: 12px 20px;
+            font-weight: 500;
+            border: 1px solid var(--border-light);
+            background: var(--page-bg);
+            transition: var(--transition);
+            font-family: var(--font);
+            color: var(--text-main);
+            font-size: 0.95rem;
+            width: 100%;
+        }
+        .form-control::placeholder { color: #A0AEC0; font-weight: 400; }
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-light);
+            background: #fff;
+            outline: none;
+        }
+        .form-control.is-invalid { border-color: var(--danger); box-shadow: 0 0 0 3px rgba(245,101,101,0.15); }
+
+        .btn-register {
+            background: linear-gradient(135deg, #FF9F66, #F28B50);
+            border: none; color: #fff; font-weight: 600;
+            padding: 14px; border-radius: var(--radius-pill);
+            transition: var(--transition); font-size: 1rem;
+            margin-top: 4px; box-shadow: var(--shadow-accent);
+            font-family: var(--font);
+        }
+        .btn-register:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(255,159,102,0.38); color: #fff; }
+        .btn-register:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+
+        .link-muted {
+            color: var(--text-muted); font-weight: 500; font-size: 0.9rem;
+            text-decoration: none; transition: var(--transition);
+            display: inline-block; margin-top: 16px;
+        }
+        .link-muted:hover { color: var(--primary); }
+
+        .divider {
+            display: flex; align-items: center;
+            margin: 20px 0; color: var(--text-muted);
+            font-weight: 500; font-size: 0.85rem;
+        }
+        .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border-light); }
+        .divider::before { margin-right: 16px; }
+        .divider::after  { margin-left:  16px; }
+
+        /* ── Thông báo lỗi inline ── */
+        .error-box {
+            display: none;
+            background: #FFF5F5;
+            border: 1px solid #FED7D7;
+            border-radius: 12px;
+            padding: 12px 16px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--danger);
+            margin-bottom: 16px;
+            align-items: center;
+            gap: 9px;
+        }
+        .error-box.show { display: flex; }
+
+        /* ── Modal thành công ── */
+        .success-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.35);
+            backdrop-filter: blur(4px);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+        .success-overlay.show { display: flex; }
+
+        .success-card {
+            background: #fff;
+            border-radius: 28px;
+            padding: 48px 40px 40px;
+            text-align: center;
+            box-shadow: 0 24px 64px rgba(0,0,0,0.12);
+            max-width: 360px;
+            width: 90%;
+            animation: popIn 0.35s cubic-bezier(0.34,1.56,0.64,1) both;
+        }
+        @keyframes popIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to   { transform: scale(1);   opacity: 1; }
+        }
+
+        .success-icon-wrap {
+            width: 80px; height: 80px;
+            background: linear-gradient(135deg, #FF9F66, #F28B50);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 20px;
+            box-shadow: 0 8px 24px rgba(255,159,102,0.35);
+        }
+        .success-icon-wrap i { font-size: 2rem; color: #fff; }
+
+        .success-card h4 { font-weight: 700; font-size: 1.35rem; color: var(--text-main); margin-bottom: 8px; }
+        .success-card p  { color: var(--text-muted); font-size: 0.9rem; line-height: 1.55; margin: 0; }
+
+        .progress-bar-wrap {
+            margin-top: 28px;
+            background: var(--border-light);
+            border-radius: 99px;
+            height: 5px;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #FF9F66, #F28B50);
+            border-radius: 99px;
+            width: 0%;
+            animation: fillBar 1.6s ease forwards;
+        }
+        @keyframes fillBar { to { width: 100%; } }
+
+        @media (max-width: 992px) { .register-info { padding: 40px; } .register-card { padding: 40px; } }
+        @media (max-width: 768px) {
+            .register-info { display: none; }
+            .register-wrapper { max-width: 440px; min-height: auto; margin: 20px; border-radius: 24px; }
+            .register-card { padding: 40px 32px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-blob blob-orange"></div>
+    <div class="bg-blob blob-beige"></div>
+
+    <!-- ── Modal thành công ── -->
+    <div class="success-overlay" id="successOverlay">
+        <div class="success-card">
+            <div class="success-icon-wrap">
+                <i class="fas fa-check"></i>
+            </div>
+            <h4 id="successTitle">Đăng ký thành công!</h4>
+            <p id="successMsg">Tài khoản của bạn đã được tạo.<br>Đang chuyển hướng đến trang đăng nhập...</p>
+            <div class="progress-bar-wrap">
+                <div class="progress-bar-fill" id="progressFill"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="register-wrapper">
+        <div class="register-info">
+            <div class="logo-icon">✨</div>
+            <h2>Smart POS</h2>
+            <p>Tạo tài khoản quản trị để bắt đầu vận hành nhà hàng của bạn một cách dễ dàng và hiệu quả.</p>
+        </div>
+
+        <div class="register-card">
+            <h3>Đăng Ký</h3>
+
+            <!-- Thông báo lỗi inline -->
+            <div class="error-box" id="errorBox">
+                <i class="fas fa-exclamation-circle"></i>
+                <span id="errorMsg">Vui lòng điền đầy đủ thông tin!</span>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Họ và Tên</label>
+                <input type="text" id="hoTen" class="form-control" placeholder="VD: Nguyễn Văn A">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Tên đăng nhập</label>
+                <input type="text" id="username" class="form-control" placeholder="VD: admin01">
+            </div>
+            <div class="mb-4">
+                <label class="form-label">Mật khẩu</label>
+                <div class="password-wrapper">
+                    <input type="password" id="password" class="form-control" placeholder="Tối thiểu 6 ký tự">
+                    <i class="fas fa-eye-slash toggle-password" id="togglePasswordIcon" onclick="togglePasswordVisibility()"></i>
+                </div>
+            </div>
+
+            <button type="button" class="btn btn-register w-100" id="btnRegister" onclick="xuLyDangKy()">
+                Tạo tài khoản
+            </button>
+
+            <div class="text-center">
+                <a href="/login.html" class="link-muted">Đã có tài khoản? Đăng nhập</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="/api-helper.js"></script>
+    <script>
+        /* ── Ẩn/hiện mật khẩu ── */
+        function togglePasswordVisibility() {
+            const inp  = document.getElementById('password');
+            const icon = document.getElementById('togglePasswordIcon');
+            const show = inp.type === 'password';
+            inp.type = show ? 'text' : 'password';
+            icon.classList.toggle('fa-eye-slash', !show);
+            icon.classList.toggle('fa-eye',        show);
+        }
+
+        /* ── Hiện lỗi inline ── */
+        function showError(msg) {
+            const box = document.getElementById('errorBox');
+            document.getElementById('errorMsg').textContent = msg;
+            box.classList.add('show');
+        }
+
+        function hideError() {
+            document.getElementById('errorBox').classList.remove('show');
+            ['hoTen','username','password'].forEach(id =>
+                document.getElementById(id).classList.remove('is-invalid')
+            );
+        }
+
+        /* ── Hiện modal thành công ── */
+        function showSuccess(title, msg) {
+            document.getElementById('successTitle').textContent = title;
+            document.getElementById('successMsg').innerHTML = msg;
+            // Reset animation
+            const fill = document.getElementById('progressFill');
+            fill.style.animation = 'none';
+            fill.offsetHeight;
+            fill.style.animation = '';
+            document.getElementById('successOverlay').classList.add('show');
+        }
+
+        /* ── Xóa lỗi khi gõ lại ── */
+        ['hoTen','username','password'].forEach(id => {
+            document.getElementById(id).addEventListener('input', hideError);
+        });
+
+        /* ── Enter ở ô mật khẩu để đăng ký ── */
+        document.getElementById('password').addEventListener('keydown', e => {
+            if (e.key === 'Enter') xuLyDangKy();
+        });
+
+        /* ── Đăng ký tài khoản ── */
+        async function xuLyDangKy() {
+            const hoTen = document.getElementById('hoTen').value.trim();
+            const user  = document.getElementById('username').value.trim();
+            const pass  = document.getElementById('password').value;
+            hideError();
+
+            if (!hoTen || !user || !pass) {
+                showError('Vui lòng điền đầy đủ tất cả thông tin!');
+                if (!hoTen)  document.getElementById('hoTen').classList.add('is-invalid');
+                if (!user)   document.getElementById('username').classList.add('is-invalid');
+                if (!pass)   document.getElementById('password').classList.add('is-invalid');
+                return;
+            }
+            if (pass.length < 6) {
+                showError('Mật khẩu phải có ít nhất 6 ký tự!');
+                document.getElementById('password').classList.add('is-invalid');
+                return;
+            }
+
+            const btn = document.getElementById('btnRegister');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin me-2"></i>Đang xử lý...';
+
+            try {
+                const result = await api.register(user, pass, hoTen);
+
+                if (result.success) {
+                    showSuccess(
+                        'Đăng ký thành công!',
+                        `Chào mừng <strong>${hoTen}</strong>!<br>Đang chuyển đến trang đăng nhập...`
+                    );
+                    setTimeout(() => { window.location.href = '/login.html'; }, 1800);
+                } else {
+                    showError(result.message || 'Đăng ký thất bại! Vui lòng thử lại.');
+                    btn.disabled = false;
+                    btn.innerHTML = 'Tạo tài khoản';
+                }
+            } catch (error) {
+                console.error('Lỗi đăng ký:', error);
+                showError('Không thể kết nối đến máy chủ. Vui lòng thử lại!');
+                btn.disabled = false;
+                btn.innerHTML = 'Tạo tài khoản';
+            }
+        }
+
+    </script>
+</body>
+</html>

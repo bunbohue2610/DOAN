@@ -1,0 +1,23 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Chạy Java và Mở Chrome",
+            "request": "launch",
+            "mainClass": "com.nhahang.quan.ly.mon.an.QuanLyMonAnApplication",
+            "serverReadyAction": {
+                "action": "startDebugging", // Đổi từ openExternally sang startDebugging
+                "pattern": "Started \\w+ in \\d+",
+                "name": "Mở Chrome" // Tên của cấu hình bên dưới
+            }
+        },
+        {
+            "type": "chrome",
+            "name": "Mở Chrome",
+            "request": "launch",
+            "url": "http://localhost:8080/menu.html",
+            "webRoot": "${workspaceFolder}"
+        }
+    ]
+}

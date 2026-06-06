@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Thông Tin Tài Khoản • Smart POS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+    :root {
+        --primary:        #FF9F66;
+        --primary-light:  #FFF2EB;
+        --primary-hover:  #F28B50;
+        --page-bg:        #F7F8FA;
+        --card-bg:        #FFFFFF;
+        --text-main:      #1A202C;
+        --text-sub:       #4A5568;
+        --text-muted:     #A0AEC0;
+        --border:         #EDF0F5;
+        --success:        #48BB78;
+        --danger:         #F56565;
+        --warning:        #ECC94B;
+        --info:           #4299E1;
+        --r-xl:  20px;
+        --r-lg:  14px;
+        --r-md:  10px;
+        --shadow-md: 0 8px 32px rgba(0,0,0,0.07);
+        --shadow-accent: 0 8px 24px rgba(255,159,102,0.22);
+        --ease: 0.25s cubic-bezier(.4,0,.2,1);
+        --font: 'Be Vietnam Pro', sans-serif;
+        --sb-width: 268px;
+        --sb-pad-x: 20px;
+        --sb-item-h: 48px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: var(--page-bg); font-family: var(--font); color: var(--text-main); overflow-x: hidden; }
+    ::-webkit-scrollbar { width:5px; height:5px; }
+    ::-webkit-scrollbar-track { background:transparent; }
+    ::-webkit-scrollbar-thumb { background:#DDE1E9; border-radius:10px; }
+
+    .page-container {
+        display: flex;
+        min-height: 100vh;
+    }
+
+    /* ═══════════════════════════════════════════ SIDEBAR ═══════════════════════════════════════════ */
+    #sidebar {
+        width: var(--sb-width);
+        min-height: 100vh;
+        height: 100vh;
+        position: sticky;
+        top: 0;
+        display: flex;
+        flex-direction: column;
+        background: #FFFFFF;
+        border-right: 1px solid var(--border);
+        overflow-y: auto;
+        overflow-x: hidden;
+        flex-shrink: 0;
+        z-index: 100;
+    }
+
+    .sb-logo { 
+        display: flex; align-items: center; gap: 12px;
+        padding: 28px var(--sb-pad-x) 20px;
+        text-decoration: none;
+    }
+    .sb-logo-icon {
+        width: 40px; height: 40px;
+        background: linear-gradient(135deg, #FF9F66, #F28B50);
+        border-radius: 12px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.15rem;
+        box-shadow: var(--shadow-accent);
+        color: white;
+        flex-shrink: 0;
+    }
+    .sb-logo-text { font-size: 1.1rem; font-weight: 700; color: var(--text-main); }
+    .sb-logo-text span { color: var(--primary); }
+
+    .sb-badge {
+        margin: 4px var(--sb-pad-x) 20px;
+        background: var(--page-bg);
+        border: 1px solid var(--border);
+        border-radius: var(--r-lg);
+        padding: 12px 16px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .sb-badge-avatar {
+        width: 36px; height: 36px;
+        background: var(--primary-light);
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        color: var(--primary);
+        font-size: 0.9rem;
+        flex-shrink: 0;
+    }
+    .sb-badge-info small { display:block; font-size:0.7rem; color:var(--text-muted); font-weight:500; }
+    .sb-badge-info strong { font-size:0.9rem; font-weight:600; color:var(--text-main); }
+
+    .sb-divider { height:1px; background:var(--border); margin: 4px var(--sb-pad-x) 0; }
+
+    .sb-section {
+        font-size: 0.68rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--text-muted);
+        padding: 20px var(--sb-pad-x) 8px;
+    }
+
+    .sb-nav { padding: 0 10px; flex: 1; }
+
+    .sb-link {
+        display: flex; align-items: center; gap: 12px;
+        height: var(--sb-item-h);
+        padding: 0 14px;
+        border-radius: var(--r-lg);
+        text-decoration: none;
+        color: var(--text-sub);
+        transition: background var(--ease), color var(--ease), transform var(--ease);
+        font-size: 0.9rem;
+        font-weight: 500;
+        margin-bottom: 3px;
+        position: relative;
+    }
+
+    .sb-link:hover {
+        background: var(--page-bg);
+        color: var(--text-main);
+        transform: translateX(2px);
+    }
+    .sb-link.active {
+        background: linear-gradient(135deg, #FF9F66, #F28B50);
+        color: #fff;
+        font-weight: 600;
+        box-shadow: var(--shadow-accent);
+        transform: none;
+    }
+    .sb-link.active .sb-icon { color: #fff; }
+    .sb-link.link-success { color: var(--success); }
+    .sb-link.link-success:hover { background: #F0FFF4; }
+    .sb-link.link-warning { color: #B7791F; }
+    .sb-link.link-warning:hover { background: #FFFFF0; }
+    .sb-link.link-danger { color: var(--danger); }
+    .sb-link.link-danger:hover { background: #FFF5F5; }
+
+    .sb-icon {
+        width: 20px;
+        text-align: center;
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        flex-shrink: 0;
+        transition: color var(--ease);
+    }
+    .sb-link:hover .sb-icon { color: var(--text-main); }
+    .sb-link.link-success .sb-icon { color: var(--success); }
+    .sb-link.link-warning .sb-icon { color: #B7791F; }
+    .sb-link.link-danger .sb-icon { color: var(--danger); }
+
+    .sb-footer { padding: 16px 10px 24px; }
+
+    .sb-logo-icon i {
+        color: white;
+    }
+
+    .sb-link.active:hover { color: #fff; }
+
+    /* ═══════════════════════════════════════════ MAIN CONTENT ═══════════════════════════════════════════ */
+    .main-content {
+        flex: 1;
+        padding: 30px;
+        overflow-y: auto;
+    }
+
+    .page-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin-bottom: 30px;
+        color: var(--text-main);
+    }
+
+    .profile-container {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 30px;
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    /* Info Card (Bên trái) */
+    .info-card {
+        background: var(--card-bg);
+        border-radius: var(--r-xl);
+        padding: 30px;
+        box-shadow: var(--shadow-md);
+    }
+
+    .profile-avatar {
+        width: 100px;
+        height: 100px;
+        background: linear-gradient(135deg, #FF9F66, #F28B50);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        color: white;
+        margin: 0 auto 20px;
+        box-shadow: var(--shadow-accent);
+    }
+
+    .info-item {
+        margin-bottom: 20px;
+    }
+
+    .info-label {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        font-weight: 500;
+        margin-bottom: 5px;
+    }
+
+    .info-value {
+        font-size: 1rem;
+        color: var(--text-main);
+        font-weight: 500;
+        word-break: break-word;
+    }
+
+    .divider {
+        height: 1px;
+        background: var(--border);
+        margin: 20px 0;
+    }
+
+    /* Edit Form (Bên phải) */
+    .edit-form {
+        background: var(--card-bg);
+        border-radius: var(--r-xl);
+        padding: 30px;
+        box-shadow: var(--shadow-md);
+    }
+
+    .form-section {
+        margin-bottom: 30px;
+    }
+
+    .form-section-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--text-main);
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .form-section-title i {
+        color: var(--primary);
+        font-size: 1.2rem;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-label {
+        display: block;
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: var(--text-main);
+        margin-bottom: 6px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid var(--border);
+        border-radius: var(--r-lg);
+        font-size: 0.95rem;
+        font-family: var(--font);
+        transition: border-color var(--ease);
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(255, 159, 102, 0.1);
+    }
+
+    .help-text {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin-top: 5px;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 30px;
+    }
+
+    .btn {
+        padding: 10px 24px;
+        border-radius: var(--r-lg);
+        border: none;
+        font-weight: 600;
+        cursor: pointer;
+        font-size: 0.95rem;
+        transition: all var(--ease);
+        font-family: var(--font);
+    }
+
+    .btn-primary {
+        background: var(--primary);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: var(--primary-hover);
+        box-shadow: var(--shadow-accent);
+    }
+
+    .btn-cancel {
+        background: var(--border);
+        color: var(--text-main);
+    }
+
+    .btn-cancel:hover {
+        background: var(--primary-light);
+    }
+
+    .alert {
+        padding: 12px 16px;
+        border-radius: var(--r-lg);
+        margin-bottom: 20px;
+        display: none;
+        font-size: 0.9rem;
+        animation: slideDown 0.3s ease;
+    }
+
+    .alert.show {
+        display: block;
+    }
+
+    .alert-success {
+        background: #C6F6D5;
+        color: #22543D;
+        border: 1px solid #9AE6B4;
+    }
+
+    .alert-danger {
+        background: #FED7D7;
+        color: #742A2A;
+        border: 1px solid #FC8181;
+    }
+
+    .alert-info {
+        background: #BEE3F8;
+        color: #2C5282;
+        border: 1px solid #90CDF4;
+    }
+
+    @keyframes slideDown {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .password-field {
+        position: relative;
+    }
+
+    .toggle-password {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+    }
+
+    .toggle-password:hover {
+        color: var(--text-main);
+    }
+
+    .loading {
+        display: none;
+        text-align: center;
+    }
+
+    .loading.show {
+        display: block;
+    }
+
+    .spinner {
+        border: 3px solid var(--border);
+        border-top: 3px solid var(--primary);
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .profile-container {
+            grid-template-columns: 1fr;
+        }
+
+        .main-content {
+            padding: 20px;
+        }
+
+        #sidebar {
+            width: 100%;
+            height: auto;
+            position: relative;
+            border-right: none;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .page-container {
+            flex-direction: column;
+        }
+
+        .sb-badge, .sb-divider, .sb-nav, .sb-footer {
+            display: none;
+        }
+    }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <!-- SIDEBAR -->
+        <nav id="sidebar">
+            <a class="sb-logo" href="/admin.html">
+                <div class="sb-logo-icon"><i class="fas fa-utensils"></i></div>
+                <div class="sb-logo-text">Smart<span>POS</span></div>
+            </a>
+            <div class="sb-badge">
+                <div class="sb-badge-avatar"><i class="fas fa-user-tie"></i></div>
+                <div class="sb-badge-info">
+                    <small>Đang quản lý</small>
+                    <strong id="hien-thi-ten">Quản Lý</strong>
+                </div>
+            </div>
+
+            <div class="sb-divider"></div>
+
+            <div class="sb-nav">
+                <div class="sb-section">Quản lý</div>
+                <a href="/admin.html" class="sb-link">
+                    <i class="sb-icon fas fa-border-all"></i>
+                    <span>Sơ đồ bàn</span>
+                </a>
+                <a href="/admin.html" class="sb-link">
+                    <i class="sb-icon fas fa-utensils"></i>
+                    <span>Thực đơn</span>
+                </a>
+                <a href="/quan-ly-voucher.html" class="sb-link link-success">
+                    <i class="sb-icon fas fa-tags"></i>
+                    <span>Khuyến mãi</span>
+                </a>
+                <a href="/admin.html" class="sb-link">
+                    <i class="sb-icon fas fa-plus-circle"></i>
+                    <span>Thêm bàn</span>
+                </a>
+                <a href="/admin.html" class="sb-link link-warning">
+                    <i class="sb-icon fas fa-qrcode"></i>
+                    <span>QR Order</span>
+                </a>
+                <a href="/thongke.html" class="sb-link">
+                    <i class="sb-icon fas fa-chart-pie"></i>
+                    <span>Thống kê</span>
+                </a>
+                <div class="sb-divider"></div>
+                <a href="/thong-tin-admin.html" class="sb-link active">
+                    <i class="sb-icon fas fa-user-circle"></i>
+                    <span>Thông tin tài khoản</span>
+                </a>
+            </div>
+            <div class="sb-footer">
+                <a href="#" onclick="logout(); return false;" class="sb-link link-danger">
+                    <i class="sb-icon fas fa-sign-out-alt"></i>
+                    <span>Đăng xuất</span>
+                </a>
+            </div>
+        </nav>
+
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+            <div class="page-title">
+                <i class="fas fa-user-circle" style="color: var(--primary); margin-right: 10px;"></i>
+                Thông Tin Tài Khoản
+            </div>
+
+            <div id="alert" class="alert"></div>
+
+            <div class="profile-container">
+                <!-- Info Card (Bên trái) -->
+                <div class="info-card">
+                    <div class="profile-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-label">Tên Đăng Nhập</div>
+                        <div class="info-value" id="displayUsername">-</div>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <div class="info-item">
+                        <div class="info-label">Họ Tên</div>
+                        <div class="info-value" id="displayHoTen">-</div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-label">Vai Trò</div>
+                        <div class="info-value" id="displayVaiTro">-</div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-label">Nhà Cung Cấp Xác Thực</div>
+                        <div class="info-value" id="displayAuthProvider">-</div>
+                    </div>
+                </div>
+
+                <!-- Edit Form (Bên phải) -->
+                <div class="edit-form">
+                    <!-- Phần 1: Cập nhật Họ Tên -->
+                    <div class="form-section">
+                        <div class="form-section-title">
+                            <i class="fas fa-edit"></i>
+                            Chỉnh Sửa Thông Tin Cơ Bản
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Họ Tên</label>
+                            <input type="text" id="hoTenInput" class="form-control" placeholder="Nhập họ tên">
+                            <div class="help-text">Tên hiển thị của bạn trong hệ thống</div>
+                        </div>
+
+                    </div>
+
+                    <div class="divider" id="passwordDivider"></div>
+
+                    <!-- Phần 2: Đổi Mật Khẩu -->
+                    <div class="form-section" id="passwordSection">
+                        <div class="form-section-title">
+                            <i class="fas fa-lock"></i>
+                            Đổi Mật Khẩu
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Mật Khẩu Cũ *</label>
+                            <div class="password-field">
+                                <input type="password" id="passwordCuInput" class="form-control" placeholder="Nhập mật khẩu cũ">
+                                <i class="fas fa-eye toggle-password" onclick="togglePasswordVisibility('passwordCuInput')"></i>
+                            </div>
+                            <div class="help-text">Bắt buộc nếu muốn thay đổi mật khẩu</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Mật Khẩu Mới</label>
+                            <div class="password-field">
+                                <input type="password" id="passwordMoiInput" class="form-control" placeholder="Nhập mật khẩu mới">
+                                <i class="fas fa-eye toggle-password" onclick="togglePasswordVisibility('passwordMoiInput')"></i>
+                            </div>
+                            <div class="help-text">Để trống nếu không muốn đổi mật khẩu</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Xác Nhận Mật Khẩu Mới</label>
+                            <div class="password-field">
+                                <input type="password" id="passwordMoiLan2Input" class="form-control" placeholder="Nhập lại mật khẩu mới">
+                                <i class="fas fa-eye toggle-password" onclick="togglePasswordVisibility('passwordMoiLan2Input')"></i>
+                            </div>
+                            <div class="help-text">Phải trùng với mật khẩu mới ở trên</div>
+                        </div>
+                    </div>
+
+                    <!-- Nút Lưu -->
+                    <div class="form-actions">
+                        <button class="btn btn-primary" onclick="saveProfile()">
+                            <i class="fas fa-save" style="margin-right: 8px;"></i>
+                            Lưu Thay Đổi
+                        </button>
+                        <button class="btn btn-cancel" onclick="resetForm()">
+                            <i class="fas fa-redo" style="margin-right: 8px;"></i>
+                            Làm Mới
+                        </button>
+                    </div>
+
+                    <div id="loading" class="loading">
+                        <div class="spinner"></div>
+                        <p style="margin-top: 10px; color: var(--text-muted);">Đang xử lý...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    let currentProfile = null;
+    // ═══════════════════════════════════════════ UTILITIES ═══════════════════════════════════════════
+
+    // Lấy ID user từ localStorage hoặc sessionStorage
+    function getUserId() {
+        // Thử lấy từ localStorage trước
+        let userId = localStorage.getItem('userId');
+        if (userId) return parseInt(userId);
+        
+        // Nếu không có, thử lấy từ sessionStorage
+        const adminUser = sessionStorage.getItem('adminUser');
+        if (adminUser) {
+            try {
+                const user = JSON.parse(adminUser);
+                return user.id || null;
+            } catch (e) {
+                console.error('Lỗi parse adminUser:', e);
+            }
+        }
+        
+        return null;
+    }
+
+    // Lấy thông tin user từ localStorage hoặc sessionStorage
+    function getCurrentUser() {
+        const userId = getUserId();
+        if (!userId) return null;
+        
+        return { id: userId };
+    }
+
+    function updateSidebarName(profile) {
+        const nameEl = document.getElementById('hien-thi-ten');
+        if (!nameEl) return;
+
+        if (profile) {
+            nameEl.textContent = profile.hoTen || profile.tenTaiKhoan || profile.username || 'Quản Lý';
+            return;
+        }
+
+        const adminUser = sessionStorage.getItem('adminUser');
+        if (adminUser) {
+            try {
+                const user = JSON.parse(adminUser);
+                nameEl.textContent = user.hoTen || user.tenTaiKhoan || user.username || 'Quản Lý';
+            } catch (e) {
+                console.error('Lỗi parse adminUser:', e);
+            }
+        }
+    }
+
+    // Hiển thị alert
+    function isGoogleAccount(profile) {
+        return (profile?.authProvider || '').toUpperCase() === 'GOOGLE';
+    }
+
+    function clearPasswordFields() {
+        ['passwordCuInput', 'passwordMoiInput', 'passwordMoiLan2Input'].forEach(id => {
+            const input = document.getElementById(id);
+            if (input) input.value = '';
+        });
+    }
+
+    function updatePasswordSectionVisibility(profile) {
+        const hidden = isGoogleAccount(profile);
+        const passwordSection = document.getElementById('passwordSection');
+        const passwordDivider = document.getElementById('passwordDivider');
+
+        if (passwordSection) passwordSection.style.display = hidden ? 'none' : '';
+        if (passwordDivider) passwordDivider.style.display = hidden ? 'none' : '';
+        if (hidden) clearPasswordFields();
+    }
+
+    function showAlert(message, type = 'info') {
+        const alertEl = document.getElementById('alert');
+        alertEl.textContent = message;
+        alertEl.className = `alert alert-${type} show`;
+        
+        if (type !== 'danger') {
+            setTimeout(() => {
+                alertEl.classList.remove('show');
+            }, 3000);
+        }
+    }
+
+    // Toggle password visibility
+    function togglePasswordVisibility(inputId) {
+        const input = document.getElementById(inputId);
+        const isPassword = input.type === 'password';
+        input.type = isPassword ? 'text' : 'password';
+        
+        // Cập nhật icon
+        const icon = event.target;
+        icon.className = isPassword ? 'fas fa-eye-slash toggle-password' : 'fas fa-eye toggle-password';
+    }
+
+    // ═══════════════════════════════════════════ LOAD PROFILE ═══════════════════════════════════════════
+
+    // Load thông tin profile khi trang load
+    async function loadProfile() {
+        try {
+            const user = getCurrentUser();
+            
+            // Debug logging
+            console.log('UserID từ getCurrentUser():', user?.id);
+            console.log('LocalStorage userId:', localStorage.getItem('userId'));
+            console.log('SessionStorage adminUser:', sessionStorage.getItem('adminUser'));
+            
+            if (!user || !user.id) {
+                console.warn('Không tìm thấy user ID, redirect về login');
+                showAlert('Vui lòng đăng nhập lại', 'danger');
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 1000);
+                return;
+            }
+
+            // Gọi API để lấy thông tin profile
+            const response = await fetch(`/api/auth/profile/${user.id}`);
+            const data = await response.json();
+
+            if (data.success) {
+                const profile = data.data;
+                currentProfile = profile;
+                
+                // Hiển thị thông tin
+                document.getElementById('displayUsername').textContent = profile.username;
+                document.getElementById('displayHoTen').textContent = profile.hoTen || '-';
+                document.getElementById('displayVaiTro').textContent = profile.vaiTro;
+                document.getElementById('displayAuthProvider').textContent = profile.authProvider || 'LOCAL';
+                updateSidebarName(profile);
+                updatePasswordSectionVisibility(profile);
+
+                // Load form với thông tin hiện tại
+                document.getElementById('hoTenInput').value = profile.hoTen || '';
+            } else {
+                showAlert(data.message || 'Lỗi khi lấy thông tin', 'danger');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showAlert('Lỗi kết nối server', 'danger');
+        }
+    }
+
+    // ═══════════════════════════════════════════ SAVE PROFILE ═══════════════════════════════════════════
+
+    async function saveProfile() {
+        try {
+            const userId = getUserId();
+            if (!userId) {
+                showAlert('Vui lòng đăng nhập lại', 'danger');
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 1000);
+                return;
+            }
+
+            const hoTen = document.getElementById('hoTenInput').value.trim();
+            const googleAccount = isGoogleAccount(currentProfile);
+            const passwordCu = googleAccount ? '' : document.getElementById('passwordCuInput').value;
+            const passwordMoi = googleAccount ? '' : document.getElementById('passwordMoiInput').value;
+            const passwordMoiLan2 = googleAccount ? '' : document.getElementById('passwordMoiLan2Input').value;
+
+            // Validation cơ bản
+            if (!hoTen && !passwordMoi) {
+                showAlert('Vui lòng nhập ít nhất một thông tin để cập nhật', 'warning');
+                return;
+            }
+
+            // Kiểm tra mật khẩu mới
+            if (passwordMoi) {
+                if (!passwordCu) {
+                    showAlert('Vui lòng nhập mật khẩu cũ để đổi mật khẩu', 'warning');
+                    return;
+                }
+                if (passwordMoi !== passwordMoiLan2) {
+                    showAlert('Mật khẩu mới không khớp', 'danger');
+                    return;
+                }
+                if (passwordMoi.length < 3) {
+                    showAlert('Mật khẩu mới phải có ít nhất 3 ký tự', 'warning');
+                    return;
+                }
+            }
+
+            // Hiển thị loading
+            document.getElementById('loading').classList.add('show');
+
+            // Chuẩn bị dữ liệu
+            const updateData = {
+                id: userId,
+                hoTen: hoTen || null,
+                passwordCu: passwordCu || null,
+                passwordMoi: passwordMoi || null,
+                passwordMoiLan2: passwordMoiLan2 || null
+            };
+
+            // Gọi API cập nhật
+            const response = await fetch('/api/auth/profile', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(updateData)
+            });
+
+            const data = await response.json();
+            document.getElementById('loading').classList.remove('show');
+
+            if (data.success) {
+                // Cập nhật thông tin trong sessionStorage
+                const adminUser = sessionStorage.getItem('adminUser');
+                if (adminUser) {
+                    try {
+                        let user = JSON.parse(adminUser);
+                        user.hoTen = data.data.hoTen;
+                        sessionStorage.setItem('adminUser', JSON.stringify(user));
+                    } catch (e) {
+                        console.error('Lỗi cập nhật sessionStorage:', e);
+                    }
+                }
+
+                // Reload lại thông tin hiển thị
+                await loadProfile();
+                
+                // Reset form
+                resetForm();
+                
+                showAlert('Cập nhật thông tin thành công!', 'success');
+            } else {
+                showAlert(data.message || 'Lỗi cập nhật thông tin', 'danger');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            document.getElementById('loading').classList.remove('show');
+            showAlert('Lỗi kết nối server', 'danger');
+        }
+    }
+
+    // Reset form
+    function resetForm() {
+        document.getElementById('hoTenInput').value = '';
+        clearPasswordFields();
+        loadProfile();
+    }
+
+    // Đăng xuất
+    function logout() {
+        localStorage.removeItem('userId');
+        sessionStorage.removeItem('adminUser');
+        localStorage.removeItem('currentUser');
+        window.location.href = 'login.html';
+    }
+
+    // ═══════════════════════════════════════════ INIT ═══════════════════════════════════════════
+
+    // Khi trang load xong
+    document.addEventListener('DOMContentLoaded', function() {
+        updateSidebarName();
+        loadProfile();
+    });
+    </script>
+</body>
+</html>

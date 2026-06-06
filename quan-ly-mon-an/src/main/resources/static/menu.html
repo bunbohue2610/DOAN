@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Menu Gọi Món • QR Smart</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #FF9F66; 
+            --primary-light: #FFF2EB;
+            --primary-hover: #F28B50;
+            --bg-body: #F9FAFB;
+            --card-bg: #FFFFFF;
+            
+            --text-main: #2D3748;
+            --text-muted: #718096;
+            --border-light: #F0F2F5;
+            
+            --success: #48BB78;
+            --danger: #F56565;
+            --warning: #ECC94B;
+            
+            --shadow-sm: 0 4px 15px rgba(0,0,0,0.02);
+            --shadow-md: 0 10px 30px rgba(0,0,0,0.04);
+            --shadow-hover: 0 15px 35px rgba(255, 159, 102, 0.12);
+            --shadow-glass: 0 25px 50px -12px rgba(0,0,0,0.1);
+            
+            --radius-xl: 32px;
+            --radius-lg: 24px;
+            --radius-md: 16px;
+            --radius-pill: 50px;
+            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --font: 'Arial', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: var(--bg-body);
+            font-family: var(--font);
+            color: var(--text-main);
+            padding-bottom: 130px;
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+        }
+        
+        body::before {
+            content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: radial-gradient(circle at 10% 10%, rgba(255, 159, 102, 0.05) 0%, transparent 40%),
+                              radial-gradient(circle at 90% 90%, rgba(255, 159, 102, 0.08) 0%, transparent 40%);
+            z-index: -1; pointer-events: none;
+        }
+
+        ::-webkit-scrollbar { display: none; }
+
+        .lam-mo {
+            filter: blur(15px);
+            pointer-events: none;
+            transition: filter 0.4s ease;
+        }
+
+        #overlay-nhap-ban {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            z-index: 2000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.4s;
+        }
+        #overlay-nhap-ban.show { display: flex; }
+        
+        .modal-glass {
+            background: rgba(255,255,255,0.95);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-glass);
+            border: 1px solid var(--border-light);
+            padding: 40px 30px;
+            width: 400px;
+            max-width: 90%;
+            animation: modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes modalPop {
+            0% { transform: scale(0.85) translateY(20px); opacity: 0; }
+            100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+        
+        .input-ban-modern {
+            border-radius: var(--radius-pill);
+            border: 1px solid var(--border-light);
+            background: var(--page-bg);
+            font-weight: 500;
+            text-align: center;
+            letter-spacing: 1px;
+            padding: 16px 24px;
+            transition: var(--transition);
+            font-size: 1.05rem;
+            color: var(--text-main);
+        }
+        .input-ban-modern:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-light);
+            background: #fff;
+            outline: none;
+        }
+        .input-ban-modern.is-invalid {
+            border-color: var(--danger);
+            box-shadow: 0 0 0 4px rgba(245, 101, 101, 0.12);
+        }
+        #loi-so-ban {
+            display: none;
+            color: var(--danger);
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-top: -12px;
+            margin-bottom: 18px;
+        }
+
+        .header-gradient { background: transparent; padding: 20px 8px 16px; margin-bottom: 8px; }
+        #menu-title { color: var(--text-main); font-weight: 800; }
+        #ten-ban-hien-tai {
+            background: var(--primary-light); border-radius: var(--radius-pill);
+            padding: 8px 16px; font-weight: 600; font-size: 0.85rem;
+            color: var(--primary); border: 1px solid rgba(255, 159, 102, 0.2);
+        }
+
+        .category-scroll {
+            display: flex; overflow-x: auto; white-space: nowrap;
+            padding: 4px 8px 24px; gap: 12px; scrollbar-width: none;
+        }
+        .btn-category {
+            border-radius: var(--radius-pill); padding: 10px 24px; font-weight: 500;
+            font-size: 0.9rem; border: 1px solid var(--border-light);
+            background: var(--card-bg); color: var(--text-muted);
+            transition: var(--transition); box-shadow: var(--shadow-sm);
+        }
+        .btn-category.active {
+            background: var(--primary); color: white; border-color: var(--primary);
+            box-shadow: 0 8px 20px rgba(255, 159, 102, 0.3); font-weight: 600;
+        }
+
+        .card-mon-an {
+            border: 1px solid var(--border-light); border-radius: var(--radius-lg);
+            background: var(--card-bg); box-shadow: var(--shadow-sm);
+            transition: var(--transition); overflow: hidden;
+            display: flex; flex-direction: column; height: 100%;
+        }
+        .card-mon-an:hover { transform: translateY(-5px); box-shadow: var(--shadow-hover); border-color: var(--primary-light); }
+        .card-mon-an img { width: 100%; height: 160px; object-fit: cover; border-radius: 24px 24px 0 0; transition: transform 0.5s ease; }
+        .card-mon-an:hover img { transform: scale(1.05); }
+        .gia-tien { font-weight: 700; font-size: 1.1rem; color: var(--primary); }
+        .btn-them-mon {
+            background: var(--primary-light); color: var(--primary); border: none;
+            border-radius: var(--radius-pill); font-weight: 600; padding: 10px 0;
+            font-size: 0.9rem; transition: var(--transition);
+        }
+        .btn-them-mon:hover { background: var(--primary); color: white; box-shadow: 0 6px 15px rgba(255, 159, 102, 0.3); }
+
+        #khung-gio-hang {
+            background: rgba(255,255,255,0.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-radius: var(--radius-xl) var(--radius-xl) 0 0; box-shadow: 0 -10px 40px rgba(0,0,0,0.06);
+            border-top: 1px solid var(--border-light); transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        #chi-tiet-gio {
+            max-height: 0; overflow: hidden; transition: max-height 0.4s cubic-bezier(0.33, 1, 0.68, 1);
+            background: var(--bg-body); border-radius: var(--radius-lg); margin: 0 16px;
+        }
+        #chi-tiet-gio.mo { max-height: 550px; overflow-y: auto; margin-top: 16px; margin-bottom: 12px; border: 1px solid var(--border-light); }
+        .gio-hang-item { display: flex; justify-content: space-between; align-items: center; padding: 16px; border-bottom: 1px solid var(--border-light); background: #fff; }
+        .gio-hang-item:last-child { border-bottom: none; }
+        
+        .btn-gui-don {
+            background: var(--primary); border: none; border-radius: var(--radius-pill);
+            padding: 14px 28px; font-weight: 600; transition: var(--transition);
+            color: white; box-shadow: 0 8px 20px rgba(255, 159, 102, 0.3);
+        }
+        .btn-gui-don:hover { transform: translateY(-2px); background: var(--primary-hover); box-shadow: 0 12px 25px rgba(255, 159, 102, 0.4); color: white; }
+        .price-total { font-weight: 700; color: var(--primary); font-size: 1.2rem; }
+
+        .modal-content { background: #fff; border-radius: var(--radius-xl); border: none; box-shadow: var(--shadow-glass); }
+        .input-ghi-chu {
+            border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 16px;
+            font-size: 0.95rem; background: var(--bg-body); color: var(--text-main); transition: var(--transition);
+        }
+        .input-ghi-chu:focus { border-color: var(--primary); box-shadow: 0 0 0 4px var(--primary-light); background: #fff; outline: none; }
+        .mon-ghi-chu-header {
+            background: var(--primary-light); color: var(--primary); border-radius: var(--radius-md);
+            padding: 14px 20px; margin-bottom: 20px; font-weight: 600; border: 1px solid rgba(255, 159, 102, 0.2);
+        }
+        .btn-ok-ghi-chu { background: var(--primary); border: none; color: white; border-radius: var(--radius-pill); padding: 12px 28px; font-weight: 600; box-shadow: 0 4px 12px rgba(255, 159, 102, 0.2); }
+        .btn-ok-ghi-chu:hover { color: white; background: var(--primary-hover); transform: translateY(-1px); }
+
+        .toast-noti {
+            position: fixed; bottom: 130px; left: 50%; transform: translateX(-50%);
+            background: #fff; color: var(--text-main); padding: 12px 24px;
+            border-radius: var(--radius-pill); font-size: 0.9rem; font-weight: 500;
+            z-index: 9999; box-shadow: var(--shadow-md); border: 1px solid var(--border-light);
+            animation: slideUpToast 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), fadeOut 0.3s 1.5s forwards;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .toast-noti i { color: var(--success); }
+        @keyframes slideUpToast { from { transform: translate(-50%, 20px); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
+        @keyframes fadeOut { to { opacity: 0; transform: translate(-50%, -10px); } }
+
+        .skeleton-card { border-radius: var(--radius-lg); background: #fff; border: 1px solid var(--border-light); overflow: hidden; animation: shimmer 2s infinite; }
+        .skeleton-img { width: 100%; height: 160px; background: linear-gradient(90deg, #F0F2F5 25%, #FAFAFA 50%, #F0F2F5 75%); background-size: 200% 100%; }
+        .skeleton-text { height: 14px; background: #F0F2F5; border-radius: 20px; margin: 16px; width: 70%; }
+        .skeleton-text.short { width: 40%; margin-top: 0; }
+        @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+
+        .icon-success { color: var(--success); font-size: 3.5rem; margin-bottom: 8px; }
+        .icon-error { color: var(--danger); font-size: 3.5rem; margin-bottom: 8px; }
+
+        .floating-action-btn {
+            width: 50px; height: 50px;
+            border-radius: 50%; background: var(--card-bg); color: var(--primary);
+            box-shadow: var(--shadow-md); display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem; border: 1px solid var(--primary-light); transition: var(--transition); text-decoration: none;
+        }
+        .floating-action-btn:hover { background: var(--primary-light); transform: scale(1.1); color: var(--primary-hover); }
+    </style>
+</head>
+<body>
+
+<div id="overlay-nhap-ban" class="position-fixed w-100 h-100 top-0 start-0">
+    <div class="modal-glass text-center">
+        <div class="mb-4">
+            <div style="width: 80px; height: 80px; background: var(--primary-light); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin: 0 auto;">
+                <i class="fas fa-qrcode fa-2x" style="color: var(--primary);"></i>
+            </div>
+        </div>
+        <h3 id="overlay-title" class="fw-bold mb-2" style="color: var(--text-main);">Chào mừng bạn!</h3>
+        <p id="overlay-subtitle" class="text-muted mb-4" style="font-size: 0.95rem;">Nhập số bàn để bắt đầu</p>
+        <input type="text" id="input-so-ban" class="form-control input-ban-modern mb-4" placeholder="Ví dụ: B01, B12" autocomplete="off">
+        <div id="loi-so-ban"></div>
+        <button id="overlay-btn" class="btn text-white fw-semibold w-100 py-3 btn-gui-don m-0" onclick="xacNhanBan()">
+            <span id="overlay-btn-text">Vào thực đơn</span> <i class="fas fa-arrow-right ms-2"></i>
+        </button>
+    </div>
+</div>
+
+<div id="noi-dung-chinh">
+    <a href="javascript:void(0)" class="floating-action-btn" onclick="goiNhanVien()" style="position: fixed; right: 20px; bottom: 140px; z-index: 1000;">
+        <i class="fas fa-concierge-bell"></i>
+    </a>
+
+    <div class="container py-3">
+        <div class="header-gradient d-flex justify-content-between align-items-center flex-wrap px-2">
+            <div class="d-flex align-items-center gap-2">
+                <div style="background: var(--primary-light); width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-utensils" style="color: var(--primary); font-size: 1.2rem;"></i>
+                </div>
+                <h2 id="menu-title" class="fw-bold mb-0" style="font-size: 1.6rem;">MENU</h2>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <div class="btn-group bg-white rounded-pill p-1 shadow-sm border" role="group">
+                    <button id="btnLangVi" type="button" class="btn btn-sm rounded-pill fw-medium px-3" style="border:none;" onclick="setLang('vi')">VN</button>
+                    <button id="btnLangEn" type="button" class="btn btn-sm rounded-pill fw-medium px-3" style="border:none;" onclick="setLang('en')">EN</button>
+                </div>
+                <div id="khung-ten-ban" style="display: none;">
+                    <span id="ten-ban-hien-tai"><i class="fas fa-chair me-1"></i> Bàn ...</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="category-scroll mt-2" id="thanh-danh-muc">
+            <button class="btn-category active" onclick="locTheoDanhMuc(0, this)"><i class="fas fa-border-all me-1"></i> Tất cả</button>
+        </div>
+
+        <div id="danh-sach-mon" class="row g-3 px-1">
+            <div class="col-6 col-md-4 col-lg-3"><div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-text"></div><div class="skeleton-text short"></div></div></div>
+            <div class="col-6 col-md-4 col-lg-3"><div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-text"></div><div class="skeleton-text short"></div></div></div>
+            <div class="col-6 col-md-4 col-lg-3"><div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-text"></div><div class="skeleton-text short"></div></div></div>
+            <div class="col-6 col-md-4 col-lg-3"><div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-text"></div><div class="skeleton-text short"></div></div></div>
+        </div>
+    </div>
+
+    <div id="khung-gio-hang" class="fixed-bottom" style="display: none;">
+        <div id="chi-tiet-gio">
+            <div class="d-flex justify-content-between align-items-center px-4 pt-4 pb-2 border-bottom">
+                <h6 id="cart-detail-title" class="text-dark fw-bold mb-0">Chi tiết đơn hàng</h6>
+                <button class="btn btn-sm text-danger fw-medium" onclick="resetGioHang()" id="cart-clear-btn" style="background: #FFF5F5; border-radius: 50px; padding: 6px 14px;"><i class="fas fa-trash-alt me-1"></i>Xoá giỏ</button>
+            </div>
+            <div id="danh-sach-gio"></div>
+            
+            <div class="px-4 py-3 border-top" style="background: #fff;">
+                <label id="lbl-nhap-ma" class="form-label small fw-bold text-muted mb-2"><i class="fas fa-ticket-alt me-1"></i>Mã giảm giá</label>
+                <div class="input-group">
+                    <input type="text" id="voucherCodeInput" class="form-control form-control-sm border-end-0" placeholder="Nhập mã (nếu có)" style="border-radius: 8px 0 0 8px;">
+                    <button class="btn btn-sm text-white" style="background: var(--primary); border-radius: 0 8px 8px 0;" onclick="kiemTraVoucher()">Áp dụng</button>
+                </div>
+                <div id="voucher-message" class="small mt-1 d-none"></div>
+            </div>
+        </div>
+        
+        <div class="px-4 py-3 container-fluid d-flex justify-content-between align-items-center">
+            <div onclick="toggleGioHang()" style="cursor: pointer; flex: 1;">
+                <div class="d-flex align-items-center gap-2 mb-1">
+                    <div style="background: var(--primary-light); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-shopping-bag" style="color: var(--primary);"></i>
+                    </div>
+                    <h6 class="mb-0 fw-bold text-dark" id="cart-title-label" style="font-size: 1.1rem;">Giỏ hàng <span id="so-luong-mon" class="badge bg-danger rounded-pill ms-1 align-top" style="font-size:0.7rem;">0</span></h6>
+                    <span id="toggle-icon" class="small ms-1 text-muted fw-medium"><i class="fas fa-chevron-up"></i></span>
+                </div>
+                <span class="text-muted small" id="cart-total-label" style="padding-left: 44px;">Tổng: <strong id="tong-tien" class="price-total">0đ</strong></span>
+            </div>
+            <button class="btn btn-gui-don m-0" onclick="guiDonHang()" id="cart-send-btn">
+                Đặt món <i class="fas fa-check ms-1"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade modal-ghi-chu" id="modalGhiChu" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered px-3">
+    <div class="modal-content p-2">
+      <div class="modal-header border-0 pb-0">
+        <h5 id="note-modal-title" class="modal-title fw-bold text-dark">Ghi chú cho món</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mon-ghi-chu-header" id="tenMonGhiChu">Tên món ăn</div>
+        <label id="note-label" class="form-label fw-medium text-muted mb-2 small">Yêu cầu đặc biệt (Không bắt buộc)</label>
+        <textarea id="textareaGhiChu" class="form-control input-ghi-chu" placeholder="" rows="3" maxlength="200"></textarea>
+        <small class="text-muted d-block mt-2 text-end"><span id="charCount">0</span>/200</small>
+      </div>
+      <div class="modal-footer border-0 pt-0 flex-nowrap gap-2">
+        <button id="note-cancel-btn" type="button" class="btn btn-neutral w-50 m-0" style="border-radius:50px; background:var(--bg-body); color:var(--text-main); font-weight:500;" data-bs-dismiss="modal">Huỷ bỏ</button>
+        <button id="note-confirm-btn" type="button" class="btn btn-ok-ghi-chu w-50 m-0" onclick="luu_ghi_chu()">
+          <span id="note-confirm-text">Lưu món</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade modal-glass-popup" id="modalThongBao" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm px-4">
+    <div class="modal-content text-center p-4">
+      <div class="modal-header border-0 pb-0 justify-content-center">
+        <div style="background: #F0FFF4; width: 70px; height: 70px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+            <i id="modalIcon" class="fas fa-check icon-success m-0" style="font-size: 2.5rem;"></i>
+        </div>
+      </div>
+      <div class="modal-body pt-3 pb-2">
+        <h4 id="modalTitle" class="fw-bold mb-2 text-dark">Thành công!</h4>
+        <p id="modalMessage" class="text-muted mb-0">Đơn hàng đã được gửi đi.</p>
+      </div>
+      <div class="modal-footer border-0 pt-3">
+        <button id="modal-close-btn" type="button" class="btn btn-gui-don w-100 m-0" data-bs-dismiss="modal">Đóng</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    let gioHang = [];
+    let tongTienGoc = 0;
+    let tongTien = 0;
+    let lang = 'vi';
+    const LANG_KEY = 'menu_lang';
+    let currentVoucher = null;
+    const translationCache = {};
+    let dangDich = false;
+
+    async function googleDich(texts) {
+        const canDich = texts.filter(t => t && !translationCache[t]);
+        if (canDich.length === 0) return;
+        const joined = canDich.join('\n');
+        const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=vi&tl=en&dt=t&q=${encodeURIComponent(joined)}`;
+        try {
+            const res = await fetch(url);
+            if (!res.ok) throw new Error('translate error');
+            const data = await res.json();
+            const fullTranslated = data[0].map(seg => seg[0]).join('').trim();
+            const parts = fullTranslated.split('\n');
+            canDich.forEach((original, idx) => {
+                translationCache[original] = (parts[idx] || original).trim();
+            });
+        } catch (err) {
+            canDich.forEach(original => {
+                translationCache[original] = original;
+            });
+        }
+    }
+
+    function getTranslated(text) {
+        if (lang === 'vi') return text;
+        return translationCache[text] || text;
+    }
+
+    async function dich_va_render() {
+        if (lang === 'vi') {
+            renderDanhMucButtons();
+            const filtered = danhMucHienTai === 0 ? tatCaMonAn : tatCaMonAn.filter(m => m.danhMuc && m.danhMuc.id === danhMucHienTai);
+            hienThiMenu(filtered);
+            return;
+        }
+        dangDich = true;
+        showToastDich();
+        const tenMons = tatCaMonAn.map(m => m.tenMon);
+        const tenDanhMucs = danhMucData.map(d => d.tenDanhMuc);
+        const allTexts = [...new Set([...tenMons, ...tenDanhMucs])];
+        await googleDich(allTexts);
+        dangDich = false;
+        hideToastDich();
+        renderDanhMucButtons();
+        const filtered = danhMucHienTai === 0 ? tatCaMonAn : tatCaMonAn.filter(m => m.danhMuc && m.danhMuc.id === danhMucHienTai);
+        hienThiMenu(filtered);
+        capNhatGiaoDienGio(); 
+    }
+
+    let toastDichEl = null;
+    function showToastDich() {
+        if (toastDichEl) return;
+        toastDichEl = document.createElement('div');
+        toastDichEl.className = 'toast-noti';
+        toastDichEl.innerHTML = '<i class="fas fa-language"></i> Translating...';
+        document.body.appendChild(toastDichEl);
+    }
+    function hideToastDich() {
+        if (toastDichEl) { toastDichEl.remove(); toastDichEl = null; }
+    }
+
+    const i18n = {
+        vi: {
+            overlayWelcome: 'Chào mừng bạn!',
+            overlaySubtitle: 'Nhập số bàn để bắt đầu',
+            overlayPlaceholder: 'VD: B01, VIP2',
+            overlayEnterMenu: 'Vào thực đơn',
+            menuTitle: 'MENU',
+            allCategories: 'Tất cả',
+            cartDetailTitle: 'Chi tiết đơn hàng',
+            cartClear: 'Xoá giỏ',
+            cart: 'Giỏ hàng',
+            cartToggleView: '<i class="fas fa-chevron-up"></i>',
+            cartToggleHide: '<i class="fas fa-chevron-down"></i>',
+            cartTotal: 'Tổng:',
+            orderSend: 'Đặt món <i class="fas fa-check ms-1"></i>',
+            noteTitle: 'Ghi chú cho món',
+            noteLabel: 'Yêu cầu đặc biệt (Không bắt buộc)',
+            notePlaceholder: 'Thêm ghi chú của bạn về món ăn',
+            noteCancel: 'Huỷ bỏ',
+            noteConfirm: 'Lưu món',
+            noteCharPrefix: 'Ký tự:',
+            close: 'Đóng',
+            addToCart: 'Chọn món',
+            noItems: 'Chưa có món ăn nào',
+            loadError: 'Lỗi tải dữ liệu, thử lại sau.',
+            cartEmpty: 'Giỏ hàng của bạn đang trống',
+            missingInfoTitle: 'Thiếu thông tin',
+            missingInfoMessage: 'Vui lòng nhập số bàn (VD: B01, A03)',
+            invalidTableTitle: 'Số bàn không hợp lệ',
+            invalidTableMessage: 'Không tìm thấy bàn "{table}". Vui lòng nhập lại số bàn.',
+            occupiedTableTitle: 'Bàn đã có khách',
+            occupiedTableMessage: 'Bàn "{table}" hiện đã có khách. Vui lòng chọn bàn khác.',
+            checkTableError: 'Không thể kiểm tra số bàn. Vui lòng thử lại.',
+            cartEmptyTitle: 'Giỏ hàng trống',
+            cartEmptyMessage: 'Vui lòng chọn ít nhất một món trước khi đặt.',
+            sendSuccessTitle: 'Đặt món thành công!',
+            sendSuccessMessage: 'Bàn {table} đã gửi đơn • Tổng: {total}đ',
+            sendFailTitle: 'Gửi đơn thất bại',
+            tryAgainLater: 'Vui lòng thử lại sau.',
+            connectErrorTitle: 'Lỗi kết nối',
+            connectErrorMessage: 'Không thể kết nối đến máy chủ. Kiểm tra mạng và thử lại.',
+            addedToast: 'Đã thêm {name}',
+            removeFromCartToast: 'Đã xoá khỏi giỏ',
+            moneyUnit: 'đ',
+            voucherApplied: 'Đã giảm {percent}%',
+            voucherInvalid: 'Mã giảm giá không hợp lệ hoặc đã hết hạn'
+        },
+        en: {
+            overlayWelcome: 'Welcome!',
+            overlaySubtitle: 'Scan QR or Enter table number',
+            overlayPlaceholder: 'E.g., B01, VIP2',
+            overlayEnterMenu: 'View Menu',
+            menuTitle: 'MENU',
+            allCategories: 'All',
+            cartDetailTitle: 'Order details',
+            cartClear: 'Clear',
+            cart: 'Cart',
+            cartToggleView: '<i class="fas fa-chevron-up"></i>',
+            cartToggleHide: '<i class="fas fa-chevron-down"></i>',
+            cartTotal: 'Total:',
+            orderSend: 'Order Now <i class="fas fa-check ms-1"></i>',
+            noteTitle: 'Special request',
+            noteLabel: 'Note (optional)',
+            notePlaceholder: 'E.g., Less spicy, no onions...',
+            noteCancel: 'Cancel',
+            noteConfirm: 'Save item',
+            noteCharPrefix: 'Chars:',
+            close: 'Close',
+            addToCart: 'Add',
+            noItems: 'No items available',
+            loadError: 'Failed to load data, please try again.',
+            cartEmpty: 'Your cart is empty',
+            missingInfoTitle: 'Missing info',
+            missingInfoMessage: 'Please enter table number',
+            invalidTableTitle: 'Invalid table number',
+            invalidTableMessage: 'Table "{table}" was not found. Please enter the table number again.',
+            occupiedTableTitle: 'Table occupied',
+            occupiedTableMessage: 'Table "{table}" already has customers. Please select another table.',
+            checkTableError: 'Unable to verify table number. Please try again.',
+            cartEmptyTitle: 'Empty cart',
+            cartEmptyMessage: 'Please choose at least one dish before ordering.',
+            sendSuccessTitle: 'Order placed!',
+            sendSuccessMessage: 'Table {table} submitted • Total: {total} VND',
+            sendFailTitle: 'Failed to order',
+            tryAgainLater: 'Please try again later.',
+            connectErrorTitle: 'Connection error',
+            connectErrorMessage: 'Unable to connect. Check your network and try again.',
+            addedToast: 'Added {name}',
+            removeFromCartToast: 'Removed',
+            moneyUnit: ' VND',
+            voucherApplied: 'Applied {percent}% off',
+            voucherInvalid: 'Invalid or expired voucher code'
+        }
+    };
+
+    function detectLang() {
+        try {
+            const saved = localStorage.getItem(LANG_KEY);
+            if (saved === 'vi' || saved === 'en') return saved;
+        } catch (e) {}
+        const navLang = (navigator.languages && navigator.languages[0]) || navigator.language || '';
+        return String(navLang).toLowerCase().startsWith('vi') ? 'vi' : 'en';
+    }
+
+    function t(key, vars = {}) {
+        let str = (i18n[lang] && i18n[lang][key]) ? i18n[lang][key] : (i18n.vi[key] || key);
+        Object.keys(vars).forEach(k => { str = str.replaceAll('{' + k + '}', vars[k]); });
+        return str;
+    }
+
+    function fmtMoney(v) {
+        if (lang === 'en') return new Intl.NumberFormat('vi-VN').format(v) + ' VND';
+        return new Intl.NumberFormat('vi-VN').format(v) + 'đ';
+    }
+
+    function setLang(next) {
+        lang = next === 'en' ? 'en' : 'vi';
+        try { localStorage.setItem(LANG_KEY, lang); } catch (e) {}
+        applyLang();
+        if (tatCaMonAn.length > 0 || danhMucData.length > 0) {
+            dich_va_render();
+        }
+        capNhatGiaoDienGio();
+    }
+
+    function applyLang() {
+        document.documentElement.lang = lang;
+        
+        const btnVi = document.getElementById('btnLangVi');
+        const btnEn = document.getElementById('btnLangEn');
+        
+        if(lang === 'vi'){
+            btnVi.style.background = 'var(--page-bg)'; btnVi.style.color = 'var(--text-main)';
+            btnEn.style.background = 'transparent'; btnEn.style.color = 'var(--text-muted)';
+        } else {
+            btnEn.style.background = 'var(--page-bg)'; btnEn.style.color = 'var(--text-main)';
+            btnVi.style.background = 'transparent'; btnVi.style.color = 'var(--text-muted)';
+        }
+
+        document.getElementById('overlay-title').innerText = t('overlayWelcome');
+        document.getElementById('overlay-subtitle').innerText = t('overlaySubtitle');
+        document.getElementById('input-so-ban').placeholder = t('overlayPlaceholder');
+        document.getElementById('overlay-btn-text').innerText = t('overlayEnterMenu');
+
+        document.getElementById('menu-title').innerText = t('menuTitle');
+
+        document.getElementById('cart-detail-title').innerText = t('cartDetailTitle');
+        document.getElementById('cart-clear-btn').innerHTML = `<i class="fas fa-trash-alt me-1"></i>${t('cartClear')}`;
+        document.getElementById('cart-send-btn').innerHTML = t('orderSend');
+
+        document.getElementById('toggle-icon').innerHTML = gioHangMo ? t('cartToggleHide') : t('cartToggleView');
+
+        const sl = gioHang.reduce((s, i) => s + i.soLuong, 0);
+        document.getElementById('cart-title-label').innerHTML = `${t('cart')} <span id="so-luong-mon" class="badge bg-danger rounded-pill ms-1 align-top" style="font-size:0.7rem;">${sl}</span>`;
+
+        document.getElementById('note-modal-title').innerText = t('noteTitle');
+        document.getElementById('note-label').innerText = t('noteLabel');
+        document.getElementById('textareaGhiChu').placeholder = t('notePlaceholder');
+        document.getElementById('note-cancel-btn').innerText = t('noteCancel');
+        document.getElementById('note-confirm-text').innerText = t('noteConfirm');
+
+        document.getElementById('modal-close-btn').innerText = t('close');
+        
+        document.getElementById('lbl-nhap-ma').innerHTML = `<i class="fas fa-ticket-alt me-1"></i>${lang === 'vi' ? 'Mã giảm giá' : 'Voucher Code'}`;
+        document.getElementById('voucherCodeInput').placeholder = lang === 'vi' ? 'Nhập mã (nếu có)' : 'Enter code (optional)';
+        document.getElementById('voucherCodeInput').nextElementSibling.innerText = lang === 'vi' ? 'Áp dụng' : 'Apply';
+    }
+
+    let danhMucData = [];
+    let danhMucHienTai = 0; 
+
+    function renderDanhMucButtons() {
+        const container = document.getElementById('thanh-danh-muc');
+        container.innerHTML = '';
+
+        const btnAll = document.createElement('button');
+        btnAll.className = 'btn-category' + (danhMucHienTai === 0 ? ' active' : '');
+        btnAll.dataset.catId = '0';
+        btnAll.innerHTML = `<i class="fas fa-border-all me-1"></i> ${t('allCategories')}`;
+        btnAll.onclick = (e) => locTheoDanhMuc(0, e.currentTarget);
+        container.appendChild(btnAll);
+
+        danhMucData.forEach(dm => {
+            const btn = document.createElement('button');
+            btn.className = 'btn-category' + (danhMucHienTai === dm.id ? ' active' : '');
+            btn.dataset.catId = String(dm.id);
+            btn.innerHTML = `<i class="fas fa-tag me-1" style="opacity: 0.6;"></i> ${getTranslated(dm.tenDanhMuc)}`;
+            btn.onclick = (e) => locTheoDanhMuc(dm.id, e.currentTarget);
+            container.appendChild(btn);
+        });
+    }
+
+    let maBanHienTai = "";
+    let tatCaMonAn = [];
+    let gioHangMo = false;
+    let adminId = null;
+    let monHienTaiGhiChu = null;
+    let modalGhiChu = null;
+
+    function getHeaders() {
+        const headers = { 'Content-Type': 'application/json' };
+        if (adminId) headers['X-User-Id'] = adminId;
+        return headers;
+    }
+
+    const modalThongBao = new bootstrap.Modal(document.getElementById('modalThongBao'));
+
+    function showModal(title, message, type = 'success') {
+        const icon = document.getElementById('modalIcon');
+        const iconWrapper = icon.parentElement;
+        
+        document.getElementById('modalTitle').innerText = title;
+        document.getElementById('modalMessage').innerText = message;
+        
+        if (type === 'success') {
+            iconWrapper.style.background = '#F0FFF4';
+            icon.className = 'fas fa-check icon-success m-0';
+            icon.style.color = 'var(--success)';
+        } else if (type === 'error') {
+            iconWrapper.style.background = '#FFF5F5';
+            icon.className = 'fas fa-times icon-error m-0';
+            icon.style.color = 'var(--danger)';
+        } else {
+            iconWrapper.style.background = '#FFFBEB';
+            icon.className = 'fas fa-exclamation icon-warning m-0';
+            icon.style.color = 'var(--warning)';
+        }
+        modalThongBao.show();
+    }
+
+    function chuanHoaSoBan(value) {
+        return String(value || '').trim().toLowerCase();
+    }
+
+    function hienThiLoiNhapBan(message) {
+        const input = document.getElementById('input-so-ban');
+        const errorBox = document.getElementById('loi-so-ban');
+        input.classList.add('is-invalid');
+        errorBox.innerText = message;
+        errorBox.style.display = 'block';
+    }
+
+    function xoaLoiNhapBan() {
+        const input = document.getElementById('input-so-ban');
+        const errorBox = document.getElementById('loi-so-ban');
+        input.classList.remove('is-invalid');
+        errorBox.innerText = '';
+        errorBox.style.display = 'none';
+    }
+
+    function moLaiNhapBan() {
+        document.getElementById('overlay-nhap-ban').classList.add('show');
+        document.getElementById('noi-dung-chinh').classList.add('lam-mo');
+        document.getElementById('khung-ten-ban').style.display = 'none';
+        maBanHienTai = "";
+        setTimeout(() => document.getElementById('input-so-ban').focus(), 150);
+    }
+
+    async function kiemTraBanHopLe(soBan) {
+        const res = await fetch('/api/orders/danh-sach-ban', { headers: getHeaders() });
+        if (!res.ok) throw new Error('check table failed');
+        const listBan = await res.json();
+        
+        if (!Array.isArray(listBan)) return { valid: false, status: 'NOT_FOUND' };
+        
+        const table = listBan.find(b => chuanHoaSoBan(b.so_ban || b.soBan) === chuanHoaSoBan(soBan));
+        
+        if (!table) {
+            return { valid: false, status: 'NOT_FOUND' };
+        }
+        
+        // Kiểm tra trạng thái bàn: TRONG (trống) là hợp lệ, CO_KHACH (có khách) là không hợp lệ
+        const trangThai = table.trang_thai || table.trangThai;
+        if (trangThai === 'CO_KHACH') {
+            return { valid: false, status: 'OCCUPIED' };
+        }
+        
+        return { valid: true, status: trangThai };
+    }
+
+    async function layThongBaoLoi(res) {
+        const clone = res.clone();
+        try {
+            const data = await res.json();
+            return data.message || data.error || t('tryAgainLater');
+        } catch (e) {
+            const text = await clone.text();
+            return text || t('tryAgainLater');
+        }
+    }
+
+    async function xacNhanBan() {
+        const input = document.getElementById('input-so-ban');
+        const val = input.value.trim();
+        xoaLoiNhapBan();
+        if (!val) {
+            moLaiNhapBan();
+            hienThiLoiNhapBan(lang === 'vi' ? 'Vui lòng nhập số bàn' : 'Please enter table number');
+            input.focus();
+            return;
+        }
+
+        // Kiểm tra xem số bàn chỉ chứa số hoặc ký tự hợp lệ
+        if (!/^[A-Z0-9\-]*$/i.test(val)) {
+            moLaiNhapBan();
+            hienThiLoiNhapBan(lang === 'vi' ? 'Số bàn không hợp lệ (chỉ nhập chữ số hoặc ký tự)' : 'Invalid table number (only numbers and letters)');
+            input.select();
+            return;
+        }
+
+        const btn = document.getElementById('overlay-btn');
+        const btnText = document.getElementById('overlay-btn-text');
+        const oldText = btnText.innerText;
+        btn.disabled = true;
+        btnText.innerText = lang === 'vi' ? 'Đang kiểm tra...' : 'Checking...';
+
+        try {
+            const result = await kiemTraBanHopLe(val);
+            if (!result.valid) {
+                moLaiNhapBan();
+                if (result.status === 'OCCUPIED') {
+                    // Bàn đã có khách
+                    hienThiLoiNhapBan(t('occupiedTableMessage', { table: val }));
+                } else {
+                    // Bàn không tồn tại
+                    hienThiLoiNhapBan(t('invalidTableMessage', { table: val }));
+                }
+                input.select();
+                return;
+            }
+        } catch (err) {
+            console.error('Table check error:', err);
+            moLaiNhapBan();
+            hienThiLoiNhapBan(t('checkTableError'));
+            input.focus();
+            return;
+        } finally {
+            btn.disabled = false;
+            btnText.innerText = oldText;
+        }
+
+        maBanHienTai = val;
+        document.getElementById('overlay-nhap-ban').classList.remove('show');
+        document.getElementById('noi-dung-chinh').classList.remove('lam-mo');
+        document.getElementById('ten-ban-hien-tai').innerHTML = `<i class="fas fa-map-pin me-1"></i> ${lang === 'vi' ? 'Bàn' : 'Table'} ${maBanHienTai}`;
+        document.getElementById('khung-ten-ban').style.display = 'block';
+        layMonAn();
+        layDanhMuc();
+    }
+
+    async function kiemTraVoucher() {
+        const codeInput = document.getElementById('voucherCodeInput').value.trim();
+        const msgBox = document.getElementById('voucher-message');
+        
+        if(!codeInput) {
+            currentVoucher = null;
+            msgBox.className = "d-none";
+            capNhatGiaoDienGio();
+            return;
+        }
+        
+        try {
+            // ✅ Lấy danh sách ID sản phẩm và danh mục từ giỏ hàng
+            const productIds = new Set();
+            const categoryIds = new Set();
+            
+            if (gioHang && gioHang.length > 0) {
+                gioHang.forEach(item => {
+                    if (item.idMonAn) productIds.add(parseInt(item.idMonAn));
+                    if (item.idDanhMuc) categoryIds.add(parseInt(item.idDanhMuc));
+                });
+            }
+            
+            // Tạo query string
+            let url = `/api/voucher/check?code=${encodeURIComponent(codeInput)}`;
+            if (productIds.size > 0) {
+                url += `&productIds=${encodeURIComponent(JSON.stringify(Array.from(productIds)))}`;
+            }
+            if (categoryIds.size > 0) {
+                url += `&categoryIds=${encodeURIComponent(JSON.stringify(Array.from(categoryIds)))}`;
+            }
+            
+            console.log('Checking voucher with URL:', url);
+            const res = await fetch(url);
+            const responseText = await res.text();
+            
+            try {
+                const data = JSON.parse(responseText);
+                if(res.ok) {
+                    currentVoucher = data;
+                    msgBox.innerText = t('voucherApplied', { percent: data.phanTramGiam });
+                    msgBox.className = "small mt-1 text-success fw-bold";
+                    capNhatGiaoDienGio();
+                } else {
+                    throw new Error(data.message || "Áp dụng thất bại");
+                }
+            } catch(parseErr) {
+                console.error('Parse response error:', parseErr, 'Response:', responseText);
+                throw parseErr;
+            }
+        } catch (error) {
+            console.error('Voucher check error:', error);
+            currentVoucher = null;
+            msgBox.innerText = t('voucherInvalid');
+            msgBox.className = "small mt-1 text-danger";
+            capNhatGiaoDienGio();
+        }
+    }
+
+    async function guiDonHang() {
+        if (!maBanHienTai) {
+            showModal(t('missingInfoTitle'), t('missingInfoMessage'), 'error');
+            moLaiNhapBan();
+            return;
+        }
+
+        if (gioHang.length === 0) {
+            showModal(t('cartEmptyTitle'), t('cartEmptyMessage'), 'warning');
+            return;
+        }
+        
+        const data = {
+            soBan: maBanHienTai,
+            tongTien: tongTienGoc,
+            voucherCode: currentVoucher ? currentVoucher.maCode : null,
+            items: gioHang.map(i => ({
+                idMonAn: i.id,
+                tenMon: i.tenMon,
+                donGia: i.giaTien, 
+                giaTien: i.giaTien,
+                soLuong: i.soLuong,
+                ghiChu: i.ghiChu || ""
+            }))
+        };
+        console.log('Sending order:', data);
+        try {
+            const res = await fetch("/api/orders/gui-don", {
+                method: "POST",
+                headers: getHeaders(),
+                body: JSON.stringify(data)
+            });
+            if (res.ok) {
+                showModal(
+                    t('sendSuccessTitle'),
+                t('sendSuccessMessage', { table: maBanHienTai, total: new Intl.NumberFormat('vi-VN').format(tongTien) }),
+                    'success'
+                );
+                resetGioHang();
+            } else {
+                const errorMsg = await layThongBaoLoi(res);
+                if (/bàn|table/i.test(errorMsg)) {
+                    moLaiNhapBan();
+                    hienThiLoiNhapBan(errorMsg);
+                    return;
+                }
+                showModal(t('sendFailTitle'), errorMsg || t('tryAgainLater'), 'error');
+            }
+        } catch (err) {
+            showModal(t('connectErrorTitle'), t('connectErrorMessage'), 'error');
+        }
+    }
+
+    function resetGioHang() {
+        gioHang = [];
+        tongTienGoc = 0;
+        tongTien = 0;
+        currentVoucher = null;
+        document.getElementById('voucherCodeInput').value = '';
+        document.getElementById('voucher-message').className = "d-none";
+        
+        document.getElementById('khung-gio-hang').style.display = 'none';
+        capNhatGiaoDienGio();
+        if (gioHangMo) {
+            gioHangMo = false;
+            document.getElementById('chi-tiet-gio').classList.remove('mo');
+            document.getElementById('toggle-icon').innerHTML = t('cartToggleView');
+        }
+    }
+
+    function themVaoGio(btn) {
+        const id = parseInt(btn.dataset.id);
+        const tenGoc = btn.dataset.ten; 
+        const tenHienThi = btn.dataset.tenDich || btn.dataset.ten; 
+        const gia = parseFloat(btn.dataset.gia);
+        const danhMucIdStr = btn.dataset.danhMucId || '';
+        const danhMucId = danhMucIdStr && danhMucIdStr.trim() ? parseInt(danhMucIdStr) : null;
+        
+        monHienTaiGhiChu = { id, ten: tenGoc, tenHienThi, gia, danhMucId };
+        document.getElementById('tenMonGhiChu').innerHTML = `<i class="fas fa-utensils me-2 opacity-75"></i>${tenHienThi}`;
+        document.getElementById('textareaGhiChu').value = '';
+        document.getElementById('charCount').innerText = '0';
+        
+        if (!modalGhiChu) {
+            modalGhiChu = new bootstrap.Modal(document.getElementById('modalGhiChu'));
+        }
+        modalGhiChu.show();
+    }
+
+    function luu_ghi_chu() {
+        if (!monHienTaiGhiChu) return;
+        const ghiChu = document.getElementById('textareaGhiChu').value.trim();
+        const { id, ten, tenHienThi, gia, danhMucId } = monHienTaiGhiChu;
+        
+        const item = gioHang.find(i => i.id === id && i.ghiChu === ghiChu);
+        if (item) {
+            item.soLuong++;
+        } else {
+            gioHang.push({ 
+                id, 
+                idMonAn: id, 
+                idDanhMuc: danhMucId,
+                tenMon: ten, 
+                giaTien: gia, 
+                soLuong: 1, 
+                ghiChu: ghiChu 
+            });
+        }
+        tinhLaiTongTien();
+        capNhatGiaoDienGio();
+        
+        showToast(`<i class="fas fa-check-circle fs-5"></i> ` + t('addedToast', { name: tenHienThi }));
+        modalGhiChu.hide();
+        monHienTaiGhiChu = null;
+    }
+
+    function showToast(messageHtml) {
+        const toast = document.createElement('div');
+        toast.className = 'toast-noti';
+        toast.innerHTML = messageHtml;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 1800);
+    }
+
+    function tinhLaiTongTien() {
+        let sumGoc = gioHang.reduce((s, i) => s + (i.giaTien * i.soLuong), 0);
+        tongTienGoc = sumGoc;
+        let sum = sumGoc;
+        if(currentVoucher && currentVoucher.phanTramGiam > 0) {
+            sum = sum - (sum * currentVoucher.phanTramGiam / 100);
+        }
+        tongTien = sum;
+    }
+
+    function capNhatGiaoDienGio() {
+        tinhLaiTongTien(); 
+        
+        const sl = gioHang.reduce((s, i) => s + i.soLuong, 0);
+        const soLuongEl = document.getElementById('so-luong-mon');
+        if (soLuongEl) soLuongEl.innerText = sl;
+
+        document.getElementById('cart-total-label').innerHTML = `${t('cartTotal')} <strong id="tong-tien" class="price-total">${fmtMoney(tongTien)}</strong>`;
+        document.getElementById('khung-gio-hang').style.display = sl > 0 ? 'block' : 'none';
+
+        const gioContainer = document.getElementById('danh-sach-gio');
+        if (gioHang.length === 0) {
+            gioContainer.innerHTML = `<div class="text-center text-muted py-5 small"><i class="fas fa-box-open d-block fs-3 mb-2 opacity-50"></i> ${t('cartEmpty')}</div>`;
+        } else {
+            gioContainer.innerHTML = gioHang.map((i, idx) => {
+                const tenHienThi = getTranslated(i.tenMon);
+                return `
+                <div class="gio-hang-item">
+                    <div style="flex: 1; min-width: 0;">
+                        <span class="fw-semibold text-dark text-truncate d-block" style="font-size: 0.95rem;">${tenHienThi}</span>
+                        ${i.ghiChu ? `<small class="text-muted d-block mt-1" style="font-size: 0.8rem;"><i class="fas fa-comment-dots me-1 opacity-75"></i>${i.ghiChu}</small>` : ''}
+                    </div>
+                    <div class="d-flex align-items-center gap-2 ms-2">
+                        <div class="d-flex align-items-center border rounded-2" style="background: var(--page-bg);">
+                            <button class="btn btn-sm btn-link text-dark py-0 px-2" style="text-decoration: none;" onclick="giamSoLuong(${idx})"><i class="fas fa-minus"></i></button>
+                            <span class="px-2 fw-bold" style="min-width: 30px; text-align: center;">${i.soLuong}</span>
+                            <button class="btn btn-sm btn-link text-dark py-0 px-2" style="text-decoration: none;" onclick="tangSoLuong(${idx})"><i class="fas fa-plus"></i></button>
+                        </div>
+                        <span class="fw-bold" style="color: var(--primary); min-width: 60px; text-align: right;">${fmtMoney(i.giaTien * i.soLuong)}</span>
+                        <button class="btn btn-sm btn-light text-danger py-1 px-2 rounded-circle" onclick="xoaKhoiGio(${idx})"><i class="fas fa-times"></i></button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+    }
+
+    function xoaKhoiGio(idx) {
+        gioHang.splice(idx, 1);
+        tinhLaiTongTien();
+        capNhatGiaoDienGio();
+        showToast(`<i class="fas fa-info-circle fs-5" style="color: var(--text-muted)"></i> ` + t('removeFromCartToast'));
+    }
+
+    function tangSoLuong(idx) {
+        if (idx >= 0 && idx < gioHang.length) {
+            gioHang[idx].soLuong++;
+            tinhLaiTongTien();
+            capNhatGiaoDienGio();
+        }
+    }
+
+    function giamSoLuong(idx) {
+        if (idx >= 0 && idx < gioHang.length) {
+            if (gioHang[idx].soLuong > 1) {
+                gioHang[idx].soLuong--;
+                tinhLaiTongTien();
+                capNhatGiaoDienGio();
+            } else {
+                xoaKhoiGio(idx);
+            }
+        }
+    }
+
+    function toggleGioHang() {
+        if(gioHang.length === 0) return;
+        gioHangMo = !gioHangMo;
+        const chiTiet = document.getElementById('chi-tiet-gio');
+        const toggleIcon = document.getElementById('toggle-icon');
+        if (gioHangMo) {
+            chiTiet.classList.add('mo');
+            toggleIcon.innerHTML = t('cartToggleHide');
+        } else {
+            chiTiet.classList.remove('mo');
+            toggleIcon.innerHTML = t('cartToggleView');
+        }
+    }
+
+    async function layMonAn() {
+        try {
+            const res = await fetch('/api/mon-an', { headers: getHeaders() });
+            if (!res.ok) throw new Error('error');
+            tatCaMonAn = await res.json();
+            if (lang === 'vi') {
+                hienThiMenu(tatCaMonAn);
+            } else {
+                await dich_va_render();
+            }
+        } catch (err) {
+            document.getElementById('danh-sach-mon').innerHTML =
+                `<div class="col-12 text-center text-danger py-5"><i class="fas fa-exclamation-triangle"></i> ${t('loadError')}</div>`;
+        }
+    }
+
+    function hienThiMenu(list) {
+        const container = document.getElementById('danh-sach-mon');
+        if (!list || list.length === 0) {
+            container.innerHTML = `<div class="col-12 text-center py-5 text-muted"><i class="fas fa-utensils fs-2 d-block mb-3 opacity-25"></i> ${t('noItems')}</div>`;
+            return;
+        }
+        container.innerHTML = list.map(mon => {
+            const tenHienThi = getTranslated(mon.tenMon);
+            let htmlGia = `<p class="gia-tien mt-1 mb-3">${fmtMoney(mon.giaTien)}</p>`;
+            let giaHienTai = mon.giaTien; 
+            
+            if (mon.phanTramGiam && mon.phanTramGiam > 0) {
+                giaHienTai = mon.giaTien - (mon.giaTien * mon.phanTramGiam / 100);
+                htmlGia = `<p class="mt-1 mb-3">
+                               <del class="text-muted small me-2">${fmtMoney(mon.giaTien)}</del> 
+                               <span class="gia-tien text-danger">${fmtMoney(giaHienTai)}</span>
+                           </p>`;
+            }
+
+            return `
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="card-mon-an" style="position:relative;">
+                    ${mon.phanTramGiam > 0 ? `<div style="position:absolute; top:10px; right:10px; background:var(--danger); color:white; padding:2px 8px; border-radius:12px; font-weight:bold; font-size:0.8rem;">-${mon.phanTramGiam}%</div>` : ''}
+                    <img src="${mon.hinhAnh || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=250&fit=crop'}" alt="${tenHienThi}" loading="lazy">
+                    <div class="card-body p-3 d-flex flex-column bg-white">
+                        <h6 class="fw-bold mb-1 text-dark" style="font-size: 0.95rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${tenHienThi}</h6>
+                        ${htmlGia}
+                        <button class="btn btn-them-mon mt-auto w-100"
+                            data-id="${mon.id}"
+                            data-ten="${mon.tenMon.replace(/'/g, "\\'")}"
+                            data-ten-dich="${tenHienThi.replace(/'/g, "\\'")}"
+                            data-gia="${giaHienTai}"
+                            data-danh-muc-id="${mon.danhMuc && mon.danhMuc.id ? mon.danhMuc.id : ''}"
+                            onclick="themVaoGio(this)">
+                            ${t('addToCart')} <i class="fas fa-plus ms-1"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    async function layDanhMuc() {
+        try {
+            const res = await fetch('/api/danh-muc', { headers: getHeaders() });
+            danhMucData = await res.json();
+            danhMucHienTai = 0;
+            if (lang === 'en') {
+                await googleDich(danhMucData.map(d => d.tenDanhMuc));
+            }
+            renderDanhMucButtons();
+        } catch (err) {
+            console.warn("Lỗi tải danh mục:", err);
+        }
+    }
+
+    function locTheoDanhMuc(id, el) {
+        document.querySelectorAll('.btn-category').forEach(b => b.classList.remove('active'));
+        el.classList.add('active');
+        danhMucHienTai = id;
+        const filtered = id === 0 ? tatCaMonAn : tatCaMonAn.filter(m => m.danhMuc && m.danhMuc.id === id);
+        hienThiMenu(filtered);
+    }
+    
+    // --- GỌI NHÂN VIÊN (ĐÃ SỬA) ---
+    let _goiNhanVienTimeout = null;
+
+    async function goiNhanVien() {
+        if (!maBanHienTai) {
+            showModal(t('missingInfoTitle'), t('missingInfoMessage'), 'error');
+            return;
+        }
+
+        const btn = document.querySelector('.floating-action-btn');
+        if (btn && btn.dataset.cooldown === '1') return;
+
+        try {
+            const res = await fetch('/api/orders/goi-nhan-vien', {
+                method: 'POST',
+                headers: getHeaders(),
+                body: JSON.stringify({ soBan: maBanHienTai })
+            });
+
+            if (res.ok) {
+                showToast(
+                    `<i class="fas fa-bell fs-5" style="color:var(--warning)"></i> ` +
+                    (lang === 'vi'
+                        ? `Đã gọi nhân viên đến Bàn ${maBanHienTai}!`
+                        : `Staff called to Table ${maBanHienTai}!`)
+                );
+
+                if (btn) {
+                    btn.dataset.cooldown = '1';
+                    btn.style.background = 'var(--primary-light)';
+                    btn.style.color = 'var(--primary)';
+                    btn.innerHTML = '<i class="fas fa-check"></i>';
+                    clearTimeout(_goiNhanVienTimeout);
+                    _goiNhanVienTimeout = setTimeout(() => {
+                        btn.dataset.cooldown = '';
+                        btn.style.background = '';
+                        btn.style.color = '';
+                        btn.innerHTML = '<i class="fas fa-concierge-bell"></i>';
+                    }, 15000);
+                }
+            } else {
+                showToast('<i class="fas fa-exclamation-circle fs-5" style="color:var(--danger)"></i> Lỗi kết nối!');
+            }
+        } catch (err) {
+            showToast('<i class="fas fa-wifi fs-5" style="color:var(--danger)"></i> Không thể kết nối máy chủ!');
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const textarea = document.getElementById('textareaGhiChu');
+        if (textarea) {
+            textarea.addEventListener('input', (e) => {
+                document.getElementById('charCount').innerText = e.target.value.length;
+            });
+        }
+
+        const inputSoBan = document.getElementById('input-so-ban');
+        if (inputSoBan) {
+            inputSoBan.addEventListener('input', xoaLoiNhapBan);
+            inputSoBan.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') xacNhanBan();
+            });
+        }
+    });
+
+    window.onload = () => {
+        lang = detectLang();
+        applyLang();
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const ban = urlParams.get('ban');
+        const admin = urlParams.get('adminId') || urlParams.get('admin');
+        if (admin) adminId = admin;
+
+        if (ban) {
+            document.getElementById('input-so-ban').value = ban;
+            xacNhanBan();
+        } else {
+            document.getElementById('overlay-nhap-ban').classList.add('show');
+            document.getElementById('noi-dung-chinh').classList.add('lam-mo');
+        }
+    };
+</script>
+</body>
+</html>

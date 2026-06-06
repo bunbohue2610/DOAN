@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Quản Lý Khuyến Mãi • Smart POS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+    /* ═══════════════════════════════════════════
+       SHARED DESIGN TOKENS (đồng bộ với admin.html)
+    ═══════════════════════════════════════════ */
+    :root {
+        --primary:        #FF9F66;
+        --primary-light:  #FFF2EB;
+        --primary-hover:  #F28B50;
+        --page-bg:        #F7F8FA;
+        --card-bg:        #FFFFFF;
+
+        --text-main:      #1A202C;
+        --text-sub:       #4A5568;
+        --text-muted:     #A0AEC0;
+        --border:         #EDF0F5;
+
+        --success:        #48BB78;
+        --danger:         #F56565;
+        --warning:        #ECC94B;
+        --info:           #4299E1;
+
+        --r-xl:  20px;
+        --r-lg:  14px;
+        --r-md:  10px;
+        --r-pill:50px;
+
+        --shadow-xs: 0 1px 4px rgba(0,0,0,0.04);
+        --shadow-sm: 0 2px 12px rgba(0,0,0,0.05);
+        --shadow-md: 0 8px 32px rgba(0,0,0,0.07);
+        --shadow-accent: 0 8px 24px rgba(255,159,102,0.22);
+
+        --ease: 0.25s cubic-bezier(.4,0,.2,1);
+        --font: 'Be Vietnam Pro', sans-serif;
+
+        /* Sidebar */
+        --sb-width: 268px;
+        --sb-pad-x: 20px;
+        --sb-item-h: 48px;
+    }
+
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    body { background: var(--page-bg); font-family: var(--font); color: var(--text-main); overflow-x: hidden; }
+    ::-webkit-scrollbar { width:5px; height:5px; }
+    ::-webkit-scrollbar-track { background:transparent; }
+    ::-webkit-scrollbar-thumb { background:#DDE1E9; border-radius:10px; }
+
+    /* ═══════════════════════════════════════════
+       SIDEBAR
+    ═══════════════════════════════════════════ */
+    #sidebar {
+        width: var(--sb-width);
+        min-height: 100vh;
+        height: 100vh;
+        position: sticky;
+        top: 0;
+        display: flex;
+        flex-direction: column;
+        background: #FFFFFF;
+        border-right: 1px solid var(--border);
+        overflow-y: auto;
+        overflow-x: hidden;
+        flex-shrink: 0;
+        z-index: 100;
+    }
+
+    .sb-logo {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 28px var(--sb-pad-x) 20px;
+        text-decoration: none;
+    }
+    .sb-logo-icon {
+        width: 40px; height: 40px;
+        background: linear-gradient(135deg, #FF9F66, #F28B50);
+        border-radius: 12px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.15rem;
+        box-shadow: var(--shadow-accent);
+        flex-shrink: 0;
+    }
+    .sb-logo-text { font-size: 1.1rem; font-weight: 700; color: var(--text-main); }
+    .sb-logo-text span { color: var(--primary); }
+
+    .sb-badge {
+        margin: 4px var(--sb-pad-x) 20px;
+        background: var(--page-bg);
+        border: 1px solid var(--border);
+        border-radius: var(--r-lg);
+        padding: 12px 16px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .sb-badge-avatar {
+        width: 36px; height: 36px;
+        background: var(--primary-light);
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        color: var(--primary);
+        font-size: 0.9rem;
+        flex-shrink: 0;
+    }
+    .sb-badge-info small { display:block; font-size:0.7rem; color:var(--text-muted); font-weight:500; }
+    .sb-badge-info strong { font-size:0.9rem; font-weight:600; color:var(--text-main); }
+
+    .sb-divider { height:1px; background:var(--border); margin: 4px var(--sb-pad-x) 0; }
+
+    .sb-section {
+        font-size: 0.68rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--text-muted);
+        padding: 20px var(--sb-pad-x) 8px;
+    }
+
+    .sb-nav { padding: 0 10px; flex: 1; }
+
+    .sb-link {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        height: var(--sb-item-h);
+        padding: 0 14px;
+        border-radius: var(--r-lg);
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: var(--text-sub);
+        transition: background var(--ease), color var(--ease), transform var(--ease);
+        margin-bottom: 3px;
+        position: relative;
+    }
+    .sb-link:hover {
+        background: var(--page-bg);
+        color: var(--text-main);
+        transform: translateX(2px);
+    }
+    .sb-link.active {
+        background: linear-gradient(135deg, #FF9F66, #F28B50);
+        color: #fff;
+        font-weight: 600;
+        box-shadow: var(--shadow-accent);
+        transform: none;
+    }
+    .sb-link.active .sb-icon { color: #fff; }
+    .sb-link.link-success { color: var(--success); }
+    .sb-link.link-success:hover { background: #F0FFF4; }
+    .sb-link.link-warning { color: #B7791F; }
+    .sb-link.link-warning:hover { background: #FFFFF0; }
+    .sb-link.link-danger { color: var(--danger); }
+    .sb-link.link-danger:hover { background: #FFF5F5; }
+
+    .sb-icon {
+        width: 20px;
+        text-align: center;
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        flex-shrink: 0;
+        transition: color var(--ease);
+    }
+    .sb-link:hover .sb-icon { color: var(--text-main); }
+    .sb-link.link-success .sb-icon  { color: var(--success); }
+    .sb-link.link-warning .sb-icon  { color: #B7791F; }
+    .sb-link.link-danger .sb-icon   { color: var(--danger); }
+
+    .sb-footer { padding: 16px 10px 24px; }
+
+    /* ═══════════════════════════════════════════
+       MAIN CONTENT
+    ═══════════════════════════════════════════ */
+    #content { flex: 1; padding: 36px 40px; min-width: 0; }
+
+    .page-header { margin-bottom: 28px; }
+    .page-header h2 { font-size: 1.65rem; font-weight: 700; color: var(--text-main); line-height: 1.25; }
+    .page-header .subtitle { color: var(--text-muted); font-size: 0.875rem; margin-top: 4px; }
+
+    .section-card {
+        background: var(--card-bg); border-radius: var(--r-xl);
+        border: 1px solid var(--border); box-shadow: var(--shadow-xs);
+        margin-bottom: 28px; overflow: hidden;
+    }
+    .section-header {
+        padding: 20px 28px; border-bottom: 1px solid var(--border);
+        display: flex; align-items: center; justify-content: space-between;
+    }
+    .section-header h5 { font-size: 1rem; font-weight: 700; margin: 0; }
+
+    .table th {
+        font-size: 0.72rem; text-transform: uppercase; letter-spacing: .06em;
+        font-weight: 600; color: var(--text-muted);
+        padding: 14px 16px; border-bottom: 1px solid var(--border);
+    }
+    .table td {
+        padding: 14px 16px; vertical-align: middle;
+        border-bottom: 1px solid var(--border); font-weight: 500;
+        font-size: 0.9rem;
+    }
+    .table tbody tr { transition: background var(--ease); }
+    .table tbody tr:hover { background: var(--page-bg); }
+    .table tbody tr:last-child td { border-bottom: none; }
+
+    /* ─ Buttons ─ */
+    .btn { border-radius: var(--r-pill); font-weight: 500; padding: 9px 22px; transition: transform var(--ease), box-shadow var(--ease), background var(--ease); border: none; font-size: 0.88rem; font-family: var(--font); }
+    .btn-sm { padding: 7px 16px; font-size: 0.82rem; }
+    .btn-icon { width:34px; height:34px; padding:0; display:inline-flex; align-items:center; justify-content:center; border-radius:50%; }
+
+    .btn-accent { background: linear-gradient(135deg,#FF9F66,#F28B50); color:#fff; box-shadow: var(--shadow-accent); }
+    .btn-accent:hover { color:#fff; transform:translateY(-2px); box-shadow:0 10px 28px rgba(255,159,102,.35); }
+    .btn-neutral { background: var(--page-bg); color:var(--text-main); border:1px solid var(--border); }
+    .btn-neutral:hover { background:#EDF2F7; }
+    .btn-soft-primary { background:var(--primary-light); color:var(--primary); }
+    .btn-soft-primary:hover { background:var(--primary); color:#fff; }
+    .btn-soft-danger { background:#FFF5F5; color:var(--danger); }
+    .btn-soft-danger:hover { background:var(--danger); color:#fff; }
+
+    /* ─ Forms ─ */
+    .form-control, .form-select {
+        border-radius: var(--r-lg); border:1px solid var(--border);
+        padding: 10px 16px; font-size: 0.9rem; font-family: var(--font);
+        background: var(--page-bg); color: var(--text-main); transition: border-color var(--ease), box-shadow var(--ease);
+    }
+    .form-control:focus, .form-select:focus {
+        background:#fff; border-color:var(--primary);
+        box-shadow: 0 0 0 3px rgba(255,159,102,.18); outline:none;
+    }
+
+    /* ─ Modals ─ */
+    .modal-content { border-radius: var(--r-xl); border:none; box-shadow:0 20px 60px rgba(0,0,0,.1); overflow:hidden; }
+    .modal-header { padding:22px 28px; border-bottom:1px solid var(--border); }
+    .modal-header .modal-title { font-weight:700; font-size:1.05rem; }
+    .modal-body { padding:28px; }
+    .modal-footer { padding:20px 28px; border-top:1px solid var(--border); background:var(--page-bg); }
+    .btn-close { opacity:.4; transition:opacity var(--ease), transform var(--ease); }
+    .btn-close:hover { opacity:1; transform:rotate(90deg); }
+
+    /* Toast */
+    #toast-global {
+        position: fixed; 
+        top: 50%; 
+        left: 50%; 
+        transform: translate(-50%, -50%); 
+        z-index: 9999;
+        background: #fff; 
+        color: var(--text-main);
+        padding: 18px 24px; 
+        border-radius: var(--r-lg);
+        font-weight: 500; 
+        display: none; 
+        box-shadow: 0 15px 45px rgba(0,0,0,0.15); 
+        border: 1px solid var(--border); 
+        align-items: center; 
+        gap: 12px;
+        font-size: 0.95rem; 
+        min-width: 250px;
+        justify-content: center;
+    }
+
+    @media (max-width:992px) {
+        #sidebar { display:none; }
+        #content { padding:20px; }
+    }
+    </style>
+</head>
+<body>
+
+<div id="toast-global"></div>
+
+<div class="d-flex">
+    <nav id="sidebar">
+        <a class="sb-logo" href="/admin.html">
+            <div class="sb-logo-icon">✨</div>
+            <div class="sb-logo-text">Smart<span>POS</span></div>
+        </a>
+
+        <div class="sb-badge">
+            <div class="sb-badge-avatar"><i class="fas fa-user-tie"></i></div>
+            <div class="sb-badge-info">
+                <small>Đang quản lý</small>
+                <strong id="hien-thi-ten">Quản Lý</strong>
+            </div>
+        </div>
+
+        <div class="sb-divider"></div>
+
+        <div class="sb-nav">
+            <div class="sb-section">Quản lý</div>
+
+            <a class="sb-link" href="/admin.html">
+                <i class="sb-icon fas fa-border-all"></i> Sơ đồ bàn
+            </a>
+            <a class="sb-link" href="/admin.html#section-mon-an">
+                <i class="sb-icon fas fa-utensils"></i> Thực đơn
+            </a>
+            <a class="sb-link active" href="/quan-ly-voucher.html">
+                <i class="sb-icon fas fa-tags"></i> Khuyến mãi
+            </a>
+            <a class="sb-link" href="/admin.html" onclick="sessionStorage.setItem('openModal','taoBan')">
+                <i class="sb-icon fas fa-plus-circle"></i> Thêm bàn
+            </a>
+
+            <a class="sb-link" href="/thongke.html">
+                <i class="sb-icon fas fa-chart-pie"></i> Thống kê
+            </a>
+        </div>
+
+        <div class="sb-footer">
+            <a class="sb-link link-danger" href="#" onclick="dangXuat(); return false;">
+                <i class="sb-icon fas fa-sign-out-alt"></i> Đăng xuất
+            </a>
+        </div>
+    </nav>
+
+    <div id="content">
+        <div class="page-header">
+            <h2>Chương trình Khuyến mãi</h2>
+            <div class="subtitle">Quản lý mã Voucher giảm giá cho khách hàng</div>
+        </div>
+
+        <div class="section-card">
+            <div class="section-header">
+                <h5>Danh sách mã Voucher</h5>
+                <button class="btn btn-accent btn-sm" onclick="moModalVoucher()"><i class="fas fa-plus me-1"></i>Thêm mã mới</button>
+            </div>
+            <div class="table-responsive">
+                <table class="table mb-0 border-0">
+                    <thead>
+                        <tr>
+                            <th>Mã Code</th>
+                            <th>Giảm giá</th>
+                            <th>Kiểu áp dụng</th>
+                            <th>Lượt sử dụng</th>
+                            <th>Ngày hết hạn</th>
+                            <th class="text-end pe-3">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="danh-sach-voucher">
+                        <tr><td colspan="5" class="text-center py-5 text-muted">Đang tải dữ liệu...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="voucherModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title" id="modalTitle">Thêm mã Voucher</h5>
+                <button class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body py-3" style="max-height: 70vh; overflow-y: auto;">
+                <input type="hidden" id="voucherId">
+                <div class="mb-3">
+                    <label class="form-label text-muted small fw-medium">Mã CODE (VD: 30THANG4)</label>
+                    <div class="input-group">
+                        <input type="text" id="maCode" class="form-control" style="text-transform:uppercase; border-radius:var(--r-lg) 0 0 var(--r-lg);">
+                        <button class="btn btn-neutral" style="border-radius:0 var(--r-lg) var(--r-lg) 0; border:1px solid var(--border); border-left:none;" onclick="sinhMaNgauNhien()"><i class="fas fa-random"></i></button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6 mb-3">
+                        <label class="form-label text-danger small fw-bold">% Giảm giá</label>
+                        <input type="number" id="phanTramGiam" class="form-control fw-bold text-danger" placeholder="10" min="1" max="100">
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label class="form-label text-muted small fw-medium">Số lượt dùng</label>
+                        <input type="number" id="soLuong" class="form-control" placeholder="100">
+                    </div>
+                </div>
+                <div class="mb-2">
+                    <label class="form-label text-muted small fw-medium">Ngày hết hạn (Không bắt buộc)</label>
+                    <input type="date" id="ngayHetHan" class="form-control">
+                </div>
+
+                <!-- ╔════════════════════════════════════════════════════════════ -->
+                <!--   PHẦN MỚI: Áp dụng cho từng sản phẩm / danh mục              -->
+                <!-- ╚════════════════════════════════════════════════════════════ -->
+                <div class="mb-3 mt-4 pt-3" style="border-top: 1px solid var(--border);">
+                    <label class="form-label text-muted small fw-medium mb-2">
+                        <i class="fas fa-list me-1"></i> Áp dụng Voucher (không bắt buộc)
+                    </label>
+                    
+                    <!-- Radio buttons chọn kiểu áp dụng -->
+                    <div class="mb-3 p-2" style="background: var(--page-bg); border-radius: var(--r-lg);">
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" id="kieuApDung1" name="kieuApDung" value="TOAN_BAN" checked onchange="capNhatUIApDung()">
+                            <label class="form-check-label" for="kieuApDung1">
+                                Áp dụng toàn bộ sản phẩm
+                            </label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" id="kieuApDung2" name="kieuApDung" value="CHI_DANH_MUC" onchange="capNhatUIApDung()">
+                            <label class="form-check-label" for="kieuApDung2">
+                                Áp dụng riêng danh mục
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" id="kieuApDung3" name="kieuApDung" value="CHI_MON" onchange="capNhatUIApDung()">
+                            <label class="form-check-label" for="kieuApDung3">
+                                Áp dụng riêng sản phẩm
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Chọn danh mục (hiển thị khi chọn CHI_DANH_MUC) -->
+                    <div id="phanDanhMuc" style="display: none;" class="mb-3">
+                        <label class="form-label text-muted small fw-medium">Chọn danh mục áp dụng</label>
+                        <select id="danhMucSelect" class="form-select" multiple size="4" onchange="capNhatSanPhamTheoLoai()">
+                            <option disabled>-- Đang tải danh mục --</option>
+                        </select>
+                        <small class="text-muted d-block mt-1">Giữ Ctrl/Cmd để chọn nhiều danh mục</small>
+                    </div>
+
+                    <!-- Chọn sản phẩm (hiển thị khi chọn CHI_MON) -->
+                    <div id="phanSanPham" style="display: none;" class="mb-3">
+                        <label class="form-label text-muted small fw-medium mb-2">Chọn sản phẩm áp dụng</label>
+                        <div id="danhSachSanPhamCheckbox" style="max-height: 200px; overflow-y: auto; border: 1px solid var(--border); border-radius: var(--r-lg); padding: 10px; background: var(--page-bg);">
+                            <p class="text-muted text-center py-3">-- Đang tải sản phẩm --</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button class="btn btn-neutral flex-fill" data-bs-dismiss="modal">Hủy bỏ</button>
+                <button class="btn btn-accent flex-fill" onclick="luuVoucher()">Lưu mã</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="confirmModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content text-center p-4">
+            <div class="modal-header border-0 pb-0 justify-content-center">
+                <div class="sb-icon mb-2" style="font-size: 2rem; color: var(--danger);"><i class="fas fa-exclamation-triangle"></i></div>
+            </div>
+            <div class="modal-body pb-0 mt-2">
+                <h5 class="fw-bold mb-3">Xác nhận</h5>
+                <p id="confirmMessage" class="mb-4 text-sub">Bạn có chắc chắn không?</p>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-neutral flex-fill" data-bs-dismiss="modal">Hủy</button>
+                    <button class="btn btn-soft-danger flex-fill" id="btnConfirmAction">Đồng ý</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Cache dữ liệu để hiển thị tên danh mục/sản phẩm trong bảng
+    let danhMucCache = [];
+    let sanPhamCache = [];
+
+    const voucherModal = new bootstrap.Modal(document.getElementById('voucherModal'));
+    const confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+
+    function showConfirm(message, onConfirmCallback) {
+        document.getElementById('confirmMessage').innerText = message;
+        const btnConfirm = document.getElementById('btnConfirmAction');
+        btnConfirm.onclick = () => {
+            confirmModal.hide();
+            onConfirmCallback();
+        };
+        confirmModal.show();
+    }
+
+    function showToast(msg, type='success') {
+        const t = document.getElementById('toast-global');
+        const icon = type === 'success'
+            ? '<i class="fas fa-check-circle" style="color:var(--success)"></i>'
+            : '<i class="fas fa-exclamation-circle" style="color:var(--danger)"></i>';
+        t.innerHTML = `${icon}<span>${msg}</span>`;
+        t.style.display = 'flex';
+        setTimeout(() => t.style.display = 'none', 3500);
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        const adminUser = sessionStorage.getItem('adminUser');
+        if (adminUser) {
+            try {
+                const u = JSON.parse(adminUser);
+                document.getElementById('hien-thi-ten').innerText = u.hoTen || u.tenTaiKhoan || 'Quản Lý';
+            } catch(e) {}
+        }
+        // Tải cache trước khi hiển thị vouchers
+        await loadCaches();
+        loadVouchers();
+    });
+
+    // Hàm tải cache danh mục và sản phẩm
+    async function loadCaches() {
+        try {
+            const userId = getUserId();
+            const headers = { 'Content-Type': 'application/json' };
+            if (userId) headers['X-User-Id'] = userId;
+
+            // Tải danh mục
+            const resDM = await fetch('/api/danh-muc/all', { headers });
+            if (resDM.ok) {
+                danhMucCache = await resDM.json();
+            }
+
+            // Tải sản phẩm
+            const resSP = await fetch('/api/mon-an/all', { headers });
+            if (resSP.ok) {
+                sanPhamCache = await resSP.json();
+            }
+        } catch(e) {
+            console.error('Lỗi tải cache:', e);
+        }
+    }
+
+    // Lấy tên danh mục từ ID
+    function getTenDanhMuc(id) {
+        const dm = danhMucCache.find(x => x.id === parseInt(id));
+        return dm ? dm.tenDanhMuc : `ID: ${id}`;
+    }
+
+    // Lấy tên sản phẩm từ ID
+    function getTenSanPham(id) {
+        const sp = sanPhamCache.find(x => x.id === parseInt(id));
+        return sp ? sp.tenMon : `ID: ${id}`;
+    }
+
+    async function loadVouchers() {
+        try {
+            // ✅ Gửi X-User-Id header
+            const userId = getUserId();
+            const headers = { 'Content-Type': 'application/json' };
+            if (userId) headers['X-User-Id'] = userId;
+            
+            const res = await fetch('/api/voucher', { headers });
+            const data = await res.json();
+            let html = '';
+            if (!data.length) {
+                html = '<tr><td colspan="6" class="text-center py-5 text-muted">Chưa có mã giảm giá nào.</td></tr>';
+            } else {
+                data.forEach(v => {
+                    const han = v.ngayHetHan
+                        ? new Date(v.ngayHetHan).toLocaleDateString('vi-VN')
+                        : 'Không giới hạn';
+                    
+                    let kieuText = 'Toàn bộ bàn menu';
+                    let chiTietApDung = '';
+                    
+                    if (v.kieuApDung === 'CHI_DANH_MUC') {
+                        kieuText = 'Riêng danh mục';
+                        try {
+                            const danhMucIds = JSON.parse(v.danhSachDanhMuc || '[]');
+                            const tenDanhMuc = danhMucIds.map(id => getTenDanhMuc(id)).join(', ');
+                            chiTietApDung = `<small style="color: var(--text-muted); display: block; margin-top: 4px;"><strong>Danh mục:</strong> ${tenDanhMuc}</small>`;
+                        } catch(e) {
+                            chiTietApDung = '<small style="color: var(--text-muted); margin-top: 4px;">Lỗi tải danh mục</small>';
+                        }
+                    } else if (v.kieuApDung === 'CHI_MON') {
+                        kieuText = 'Riêng sản phẩm';
+                        try {
+                            const sanPhamIds = JSON.parse(v.danhSachSanPham || '[]');
+                            const tenSanPham = sanPhamIds.map(id => getTenSanPham(id)).join(', ');
+                            chiTietApDung = `<small style="color: var(--text-muted); display: block; margin-top: 4px;"><strong>Sản phẩm:</strong> ${tenSanPham}</small>`;
+                        } catch(e) {
+                            chiTietApDung = '<small style="color: var(--text-muted); margin-top: 4px;">Lỗi tải sản phẩm</small>';
+                        }
+                    }
+                    
+                    html += `<tr>
+                        <td class="fw-bold" style="color:var(--primary)">${v.maCode}</td>
+                        <td class="text-danger fw-bold">-${v.phanTramGiam}%</td>
+                        <td>
+                            <small style="color: var(--text-muted);">${kieuText}</small>
+                            ${chiTietApDung}
+                        </td>
+                        <td>${v.soLuong} lượt</td>
+                        <td>${han}</td>
+                        <td class="text-end pe-3">
+                            <button class="btn btn-icon btn-soft-danger" onclick="xoaVoucher(${v.id})">
+                                <i class="fas fa-trash" style="font-size:.7rem"></i>
+                            </button>
+                        </td>
+                    </tr>`;
+                });
+            }
+            document.getElementById('danh-sach-voucher').innerHTML = html;
+        } catch(e) {
+            document.getElementById('danh-sach-voucher').innerHTML =
+                '<tr><td colspan="6" class="text-center py-5 text-muted">Lỗi tải dữ liệu.</td></tr>';
+            console.error('Lỗi tải voucher:', e);
+        }
+    }
+
+    // Cập nhật giao diện khi thay đổi kiểu áp dụng
+    function capNhatUIApDung() {
+        const kieuApDung = document.querySelector('input[name="kieuApDung"]:checked').value;
+        const phanDanhMuc = document.getElementById('phanDanhMuc');
+        const phanSanPham = document.getElementById('phanSanPham');
+        
+        if (kieuApDung === 'TOAN_BAN') {
+            phanDanhMuc.style.display = 'none';
+            phanSanPham.style.display = 'none';
+        } else if (kieuApDung === 'CHI_DANH_MUC') {
+            phanDanhMuc.style.display = 'block';
+            phanSanPham.style.display = 'none';
+        } else if (kieuApDung === 'CHI_MON') {
+            phanDanhMuc.style.display = 'none';
+            phanSanPham.style.display = 'block';
+        }
+    }
+
+    // Lấy userId từ localStorage
+    function getUserId() {
+        const userId = localStorage.getItem('userId');
+        console.log('getUserId:', userId);
+        return userId;
+    }
+
+    // Tải danh sách danh mục từ API
+    async function taiDanhMuc() {
+        try {
+            const userId = getUserId();
+            const headers = { 'Content-Type': 'application/json' };
+            if (userId) {
+                headers['X-User-Id'] = userId;
+            }
+            
+            console.log('Tải danh mục với headers:', headers);
+            const res = await fetch('/api/danh-muc/all', { headers });
+            if (!res.ok) {
+                console.error('Lỗi HTTP:', res.status, res.statusText);
+                return;
+            }
+            
+            const danhMucList = await res.json();
+            danhMucCache = danhMucList; // Lưu vào cache
+            console.log('Danh mục tải được:', danhMucList);
+            const select = document.getElementById('danhMucSelect');
+            select.innerHTML = '';
+            
+            if (!Array.isArray(danhMucList) || danhMucList.length === 0) {
+                const option = document.createElement('option');
+                option.textContent = '-- Chưa có danh mục nào --';
+                option.disabled = true;
+                select.appendChild(option);
+            } else {
+                danhMucList.forEach(dm => {
+                    const option = document.createElement('option');
+                    option.value = dm.id;
+                    option.textContent = dm.tenDanhMuc;
+                    select.appendChild(option);
+                });
+            }
+            
+            // Tải sản phẩm ban đầu
+            const allMonAn = await taiTatCaSanPham();
+            await taiSanPham([], allMonAn);
+        } catch(e) {
+            console.error('Lỗi tải danh mục:', e);
+            document.getElementById('danhMucSelect').innerHTML = '<option disabled>Lỗi khi tải danh mục</option>';
+        }
+    }
+
+    // Tải tất cả sản phẩm từ API
+    async function taiTatCaSanPham() {
+        try {
+            const userId = getUserId();
+            const headers = { 'Content-Type': 'application/json' };
+            if (userId) {
+                headers['X-User-Id'] = userId;
+            }
+            
+            console.log('Tải sản phẩm với headers:', headers);
+            const res = await fetch('/api/mon-an/all', { headers });
+            if (!res.ok) {
+                console.error('Lỗi HTTP khi tải sản phẩm:', res.status, res.statusText);
+                return [];
+            }
+            
+            const data = await res.json();
+            sanPhamCache = data; // Lưu vào cache
+            console.log('Sản phẩm tải được:', data);
+            return data;
+        } catch(e) {
+            console.error('Lỗi tải sản phẩm:', e);
+            return [];
+        }
+    }
+
+    // Cập nhật danh sách sản phẩm khi thay đổi danh mục
+    async function capNhatSanPhamTheoLoai() {
+        const danhMucSelect = document.getElementById('danhMucSelect');
+        const selectedOptions = Array.from(danhMucSelect.selectedOptions).map(opt => parseInt(opt.value));
+        const allMonAn = await taiTatCaSanPham();
+        await taiSanPham(selectedOptions, allMonAn);
+    }
+
+    // Tải danh sách sản phẩm từ API
+    async function taiSanPham(danhMucIds = [], allMonAn = []) {
+        try {
+            const container = document.getElementById('danhSachSanPhamCheckbox');
+            
+            // Nếu allMonAn trống, tải lại
+            if (!allMonAn || allMonAn.length === 0) {
+                allMonAn = await taiTatCaSanPham();
+            }
+            
+            if (danhMucIds.length === 0) {
+                // Hiển thị tất cả sản phẩm nếu không chọn danh mục cụ thể
+                if (!allMonAn || allMonAn.length === 0) {
+                    container.innerHTML = '<p class="text-muted text-center py-3">Không có sản phẩm</p>';
+                } else {
+                    container.innerHTML = allMonAn.map(sp => `
+                        <div class="form-check mb-2">
+                            <input class="form-check-input san-pham-checkbox" type="checkbox" id="sp${sp.id}" value="${sp.id}">
+                            <label class="form-check-label" for="sp${sp.id}">
+                                ${sp.tenMon} 
+                                <small class="text-muted">(${(sp.giaTien || 0).toLocaleString('vi-VN')}đ)</small>
+                            </label>
+                        </div>
+                    `).join('');
+                }
+            } else {
+                // Lọc theo danh mục đã chọn
+                const filtered = allMonAn.filter(sp => {
+                    const dmId = sp.danhMuc?.id || sp.danhMucId;
+                    return danhMucIds.includes(dmId);
+                });
+                
+                if (filtered.length === 0) {
+                    container.innerHTML = '<p class="text-muted text-center py-3">Không có sản phẩm trong danh mục này</p>';
+                } else {
+                    container.innerHTML = filtered.map(sp => `
+                        <div class="form-check mb-2">
+                            <input class="form-check-input san-pham-checkbox" type="checkbox" id="sp${sp.id}" value="${sp.id}">
+                            <label class="form-check-label" for="sp${sp.id}">
+                                ${sp.tenMon} 
+                                <small class="text-muted">(${(sp.giaTien || 0).toLocaleString('vi-VN')}đ)</small>
+                            </label>
+                        </div>
+                    `).join('');
+                }
+            }
+        } catch(e) {
+            console.error('Lỗi tải sản phẩm:', e);
+            document.getElementById('danhSachSanPhamCheckbox').innerHTML = '<p class="text-danger text-center py-3">Lỗi khi tải sản phẩm</p>';
+        }
+    }
+
+    async function moModalVoucher() {
+        document.getElementById('voucherId').value = '';
+        document.getElementById('maCode').value = '';
+        document.getElementById('phanTramGiam').value = '';
+        document.getElementById('soLuong').value = '100';
+        document.getElementById('ngayHetHan').value = '';
+        
+        // Reset radio buttons
+        document.getElementById('kieuApDung1').checked = true;
+        capNhatUIApDung();
+        
+        // Tải danh sách danh mục và sản phẩm
+        await taiDanhMuc();
+        
+        voucherModal.show();
+    }
+
+    function sinhMaNgauNhien() {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let code = 'KM-';
+        for (let i = 0; i < 5; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
+        document.getElementById('maCode').value = code;
+    }
+
+    async function luuVoucher() {
+    const maCode = document.getElementById('maCode').value.trim().toUpperCase();
+    const phanTramGiam = parseInt(document.getElementById('phanTramGiam').value);
+    const soLuong = parseInt(document.getElementById('soLuong').value) || 100;
+
+    if (!maCode) { showToast('Vui lòng nhập mã CODE', 'error'); return; }
+    if (isNaN(phanTramGiam) || phanTramGiam <= 0 || phanTramGiam > 100) {
+        showToast('Phần trăm giảm giá phải từ 1 đến 100', 'error'); return;
+    }
+
+    const kieuApDung = document.querySelector('input[name="kieuApDung"]:checked').value;
+    let danhSachDanhMuc = null;
+    let danhSachSanPham = null;
+
+    if (kieuApDung === 'CHI_DANH_MUC') {
+        const selected = Array.from(document.getElementById('danhMucSelect').selectedOptions);
+        if (selected.length === 0) { showToast('Vui lòng chọn ít nhất một danh mục', 'error'); return; }
+        danhSachDanhMuc = JSON.stringify(selected.map(opt => parseInt(opt.value)));
+    }
+
+    if (kieuApDung === 'CHI_MON') {
+        const selected = Array.from(document.querySelectorAll('.san-pham-checkbox:checked'));
+        if (selected.length === 0) { showToast('Vui lòng chọn ít nhất một sản phẩm', 'error'); return; }
+        danhSachSanPham = JSON.stringify(selected.map(cb => parseInt(cb.value)));
+    }
+
+    const data = {
+        maCode, phanTramGiam, soLuong,
+        ngayHetHan: document.getElementById('ngayHetHan').value || null,
+        trangThai: true,
+        kieuApDung, danhSachDanhMuc, danhSachSanPham
+    };
+
+    try {
+        // ✅ Gửi X-User-Id header
+        const userId = getUserId();
+        const headers = { 'Content-Type': 'application/json' };
+        if (userId) headers['X-User-Id'] = userId;
+        
+        const res = await fetch('/api/voucher', {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify(data)
+        });
+
+        // ✅ Xử lý mọi trường hợp server trả về
+        const result = await res.json().catch(() => ({}));
+
+        if (res.ok) {
+            showToast('Đã lưu mã voucher thành công!', 'success');
+            voucherModal.hide();
+            await loadCaches(); // Tải lại cache
+            loadVouchers();
+        } else {
+            showToast(result.message || result.error || `Lỗi server: ${res.status}`, 'error');
+        }
+    } catch(err) {
+        showToast('Lỗi kết nối: ' + err.message, 'error');
+    }
+}
+
+    function xoaVoucher(id) {
+        showConfirm('Bạn có chắc chắn muốn xóa mã giảm giá này không?', async () => {
+            try {
+                // ✅ Gửi X-User-Id header
+                const userId = getUserId();
+                const headers = {};
+                if (userId) headers['X-User-Id'] = userId;
+                
+                await fetch(`/api/voucher/${id}`, { 
+                    method: 'DELETE',
+                    headers: headers
+                });
+                showToast('Đã xóa mã voucher', 'success');
+                await loadCaches(); // Tải lại cache
+                loadVouchers();
+            } catch(e) {
+                showToast('Lỗi khi xóa voucher', 'error');
+            }
+        });
+    }
+
+    function dangXuat() {
+        showConfirm('Bạn có chắc muốn thoát phiên quản trị?', () => {
+            sessionStorage.removeItem('adminUser');
+            localStorage.removeItem('userId');
+            window.location.href = '/login.html';
+        });
+    }
+</script>
+</body>
+</html>
